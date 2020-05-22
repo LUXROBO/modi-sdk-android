@@ -1,0 +1,2 @@
+include ':app', ':modisdk'
+rootProject.name='ModiDemo'

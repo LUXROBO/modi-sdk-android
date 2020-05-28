@@ -4,17 +4,15 @@
 [![](https://jitpack.io/v/LUXROBO/modi-sdk-android.svg)](https://jitpack.io/#LUXROBO/modi-sdk-android)
 
 
-Easy😆 and fast💨 MODI Play API.
+Easy😆 and fast💨 MODI SDK API.
 
-
-* Free software: MIT license
 * Documentation: https://luxrobo.github.io/modi-sdk-android/index.html
 
 
 Quickstart
 -------
 
-Install the latest MODI Play API if you haven't installed it yet
+Install the latest MODI SDK API if you haven't installed it yet
 
 Add it in your root build.gradle at the end of repositories:
 
@@ -35,83 +33,85 @@ dependencies {
 }
 ```
 
-Import `modiplay.api` package and create `ModiManager` Object::
+Import `com.luxrobo.modisdk` package and create `ModiManager` Object::
 
-```java
-import com.luxrobo.modisdk.core.ModiManager;
+```kotlin
+import com.luxrobo.modisdk.core.ModiManager
 ...
 ...
-private ModiManager mModiManager = ModiManager.getInstance();
+private ModiManager mModiManager = ModiManager.getInstance()
 ```
 
-Initialize ModiManager ::
+Initialize ModiManager
 
-```java
-mModiManager.init(getApplicationContext(), mModiClient);
+```kotlin
 
-private ModiClient mModiClient = new ModiClient() {
+var mModiManager = ModiManager().init(context, mModiClient)
 
-        @Override
-        public void onFoundDevice(final BluetoothDevice device, int rssi, byte[] scanRecord) {
+private val mModiClient = object : ModiClient {
 
-        }
-
-        @Override
-        public void onDiscoveredService() {
-
-        }
-
-        @Override
-        public void onConnected() {
-
-        }
-
-        @Override
-        public void onDisconnected() {
-                
-        }
-
-        @Override
-        public void onScanning(boolean isScaning) {
-
-        }
-
-        @Override
-        public void onReceivedData(String data) {
-
-        }
-
-        @Override
-        public void onReceivedData(byte[] data) {
-
-        }
-
-        @Override
-        public void onReceivedUserData(int data) {
-
-        }
-
-        @Override
-        public void onBuzzerState(State.Buzzer state) {
-
-        }
-
-        @Override
-        public void onOffEvent() {
-
-        }
-
-        @Override
-        public void disconnectedByModulePowerOff() {
-                
-        }
-};
+    override fun stopScan() {
+    
+    }
+    
+    override fun onScan() {
+    
+    }
+    
+    override fun onScanFailure() {
+    
+    }
+    
+    override fun onFoundDevice(bleScanResult : ScanResult) {
+    
+    }
+    
+    override fun onDiscoveredService() {
+    
+    }
+    
+    override fun onDiscoverServiceFailure() {
+    
+    }
+    
+    override fun onConnecting() {
+    
+    }
+    
+    override fun onConnected() {
+    
+    }
+    
+    override fun onConnectionFailure(e : Throwable) {
+    
+    }
+    
+    override fun onDisconnected() {
+    
+    }
+    
+    override fun onReceivedData(data: String) {
+    
+    }
+    
+    override fun onReceivedData(data: ByteArray) {
+    
+    }
+    
+    override fun onOffEvent() {
+    
+    }
+    
+    override fun disconnectedByModulePowerOff() {
+     
+    }
+}
 ```
 
 Scan and Connect::
-```java
-mModiManager.scan();
+```kotlin
+mModiManager.scan()
 ...
 ...
-mModiManager.connect(deviceAddress);
+mModiManager.connect(deviceAddress)
 ```

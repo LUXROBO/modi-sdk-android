@@ -30,6 +30,7 @@ Add the dependency
 ```gradle
 dependencies {
         implementation 'com.github.LUXROBO:modi-sdk-android:0.1.1'
+        implementation 'com.polidea.rxandroidble2:rxandroidble:1.11.1'
 }
 ```
 

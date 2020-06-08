@@ -21,7 +21,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="1234ABSD"/>
+            tools:text="MODI_E0000000"/>
 
         <TextView
 
@@ -31,9 +31,10 @@
             android:layout_height="wrap_content"
             android:textSize="14dp"
             android:padding="15dp"
+            android:layout_marginLeft="130dp"
 
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/item_device_name"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="adfasdf"/>
 
@@ -48,7 +49,7 @@
             android:padding="15dp"
 
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/item_device_address"
+            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="adfasdf"/>
 

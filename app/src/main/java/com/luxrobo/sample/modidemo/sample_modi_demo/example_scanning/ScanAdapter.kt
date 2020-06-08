@@ -23,16 +23,13 @@ class ScanAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
 
-        ModiLog.d("onCreateViewHolder ")
-
         val viewDataBinding : ViewDataBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.list_item_scan, parent, false)
-
-        setRxObserver()
 
         return ItemHolder(viewDataBinding)
     }
 
     override fun getItemCount(): Int {
+
 
         return itemList.size
     }
@@ -68,38 +65,8 @@ class ScanAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     fun setItemList(list : MutableList<ScanResult>) {
 
-        itemList.addAll(list)
-    }
-
-    private fun setRxObserver() {
-
-        ModiLog.d("setRxObserver ")
-
-        Singleton.getInstance().scanResultObserver.subscribe {
-
-            val bleScanResult = it
-
-            ModiLog.d("setRxObserver : ${bleScanResult!!.bleDevice.name}")
-
-            itemList.withIndex()
-                .firstOrNull { it.value.bleDevice == bleScanResult.bleDevice }
-                ?.let {
-                    // device already in data list => update
-                    itemList[it.index] = bleScanResult
-
-                    with(itemList) {
-                        add(bleScanResult)
-                        sortBy { it.bleDevice.macAddress }
-                    }
-                }
-
-
-            ModiLog.d("bleScanResult itemList : ${itemList.size}")
-
-            notifyDataSetChanged()
-
-        }
-
+        itemList = list
+        notifyDataSetChanged()
     }
 
     fun removeAll() {

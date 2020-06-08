@@ -1,7 +1,9 @@
 # modi-sdk-android
 ===============
 
-[![](https://jitpack.io/v/LUXROBO/modi-sdk-android.svg)](https://jitpack.io/#LUXROBO/modi-sdk-android)
+| distribution|
+|-|
+| [![](https://jitpack.io/v/LUXROBO/modi-sdk-android.svg)](https://jitpack.io/#LUXROBO/modi-sdk-android)
 
 
 Easy😆 and fast💨 MODI SDK API.

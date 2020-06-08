@@ -10,7 +10,6 @@ import com.luxrobo.modisdk.core.ModiManager
 import com.luxrobo.modisdk.utils.ModiLog
 import com.luxrobo.sample.modidemo.R
 import com.luxrobo.sample.modidemo.databinding.ActivityScanBinding
-import com.luxrobo.sample.modidemo.sample_modi_demo.Singleton
 import com.luxrobo.sample.modidemo.sample_modi_demo.example_connect.ConnectActivity
 import com.polidea.rxandroidble2.scan.ScanResult
 
@@ -81,6 +80,9 @@ class ScanActivity : AppCompatActivity() {
                     ?.let {
                         // device already in data list => update
                         data[it.index] = bleScanResult!!
+//                        Singleton.getInstance().updateScanResult(data)
+
+                        adapter.setItemList(data)
 
                     }
                     ?: run {
@@ -89,10 +91,11 @@ class ScanActivity : AppCompatActivity() {
                             add(bleScanResult!!)
                             sortBy { it.bleDevice.macAddress }
                         }
-                }
+                    }
+
+//                ModiLog.d("onFoundDevice ${data.size}")
 
 
-                Singleton.getInstance().updateScanResult(bleScanResult)
 
             }
 
@@ -156,8 +159,6 @@ class ScanActivity : AppCompatActivity() {
 
     private fun setAdapter() {
 
-        ModiLog.d("setAdapter ")
-
         adapter = ScanAdapter()
         adapter.setListener(object :
             ScanAdapter.OnItemClickListener {
@@ -174,8 +175,6 @@ class ScanActivity : AppCompatActivity() {
         val layoutManager = LinearLayoutManager(this)
         binding.list.layoutManager = layoutManager
         binding.list.adapter = adapter
-
-        ModiLog.d("setAdapter end")
 
     }
 }

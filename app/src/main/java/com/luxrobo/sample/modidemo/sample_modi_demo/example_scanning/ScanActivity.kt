@@ -73,15 +73,11 @@ class ScanActivity : AppCompatActivity() {
 
             override fun onFoundDevice(bleScanResult: ScanResult?) {
 
-//                ModiLog.d("onFoundDevice ${bleScanResult?.bleDevice?.name}")
-
                 data.withIndex()
                     .firstOrNull { it.value.bleDevice.macAddress == bleScanResult!!.bleDevice.macAddress }
                     ?.let {
                         // device already in data list => update
                         data[it.index] = bleScanResult!!
-//                        Singleton.getInstance().updateScanResult(data)
-
                         adapter.setItemList(data)
 
                     }
@@ -92,10 +88,6 @@ class ScanActivity : AppCompatActivity() {
                             sortBy { it.bleDevice.macAddress }
                         }
                     }
-
-//                ModiLog.d("onFoundDevice ${data.size}")
-
-
 
             }
 

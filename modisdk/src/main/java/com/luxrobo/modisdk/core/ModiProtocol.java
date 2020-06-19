@@ -159,4 +159,44 @@ public class ModiProtocol {
         return ModiFrame.makeFrame(0xA9, 0, 0, data);
     }
 
+    public static byte[] setBootToFactory(int moduleKey) {
+
+        ModiLog.d("setBootToFactory");
+
+        byte[] data = new byte[8];
+
+        for (int i = 0; i < 7; i ++) {
+            data[i] = 0x00;
+        }
+        return ModiFrame.makeFrame(0xAD, 0, moduleKey, data);
+    }
+
+    public static byte[] setBootToApp(int moduleKey) {
+
+        ModiLog.d("setBootToApp");
+
+        byte[] data = new byte[8];
+        for (int i = 0; i < 7; i ++) {
+            data[i] = 0x00;
+        }
+
+        return ModiFrame.makeFrame(0xAE, 0, moduleKey, data);
+    }
+
+    public static byte[] setVersion(int moduleKey, byte[] version) {
+        ModiLog.d("setVersion");
+        return ModiFrame.makeFrame(0xA0, 24, moduleKey, version);
+    }
+
+    public static byte[] getVersion(int moduleKey) {
+        ModiLog.d("getVersion");
+
+        byte[] data = new byte[8];
+        for (int i = 0; i < 7; i ++) {
+            data[i] = 0x00;
+        }
+
+        return ModiFrame.makeFrame(0xA0, 25, moduleKey, data);
+    }
+
 }

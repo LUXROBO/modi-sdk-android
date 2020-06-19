@@ -60,6 +60,7 @@ class ModiManager : ModiFrameNotifier() {
 
     private var modiId = byteArrayOf(4)
     private val bytesToWrite = ByteArray(1024) // a kilobyte array
+    private var modiMode = ""
 
     private var mModiClient: ModiClient? = null
 
@@ -526,6 +527,12 @@ class ModiManager : ModiFrameNotifier() {
     fun getModiId() : ByteArray{
         return modiId
     }
+
+    fun getModiMode(): String {
+        return modiMode
+    }
+
+
 
     /**
      * 블루투스 켜기(강제로 블루투스 사용 시)

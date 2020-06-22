@@ -419,6 +419,7 @@ class ModiManager : ModiFrameNotifier() {
         connectionDispose()
         mModuleManager.resetAllModules()
         triggerDisconnect()
+        mModiClient!!.onDisconnected()
     }
 
     fun stopScan() {

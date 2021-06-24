@@ -33,6 +33,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 
+
 class ModiManager : ModiFrameNotifier() {
 
     private lateinit var rxBleClient: RxBleClient
@@ -269,7 +270,6 @@ class ModiManager : ModiFrameNotifier() {
 
     }
 
-
     fun connect(macAddress : String) {
 
         if(isConnected() && bleDevice.macAddress == macAddress) {
@@ -282,15 +282,15 @@ class ModiManager : ModiFrameNotifier() {
 //        connectionObservable = prepareConnectionObservable()
 
         val mtuNegotiationObservableTransformer = ObservableTransformer<RxBleConnection, RxBleConnection> { upstream ->
-                upstream.doOnSubscribe { ModiLog.i("MTU", "MTU negotiation is supported") }
-                    .flatMapSingle { connection ->
-                        connection.requestMtu(GATT_MTU_MAXIMUM)
-                            .doOnSubscribe { ModiLog.i("MTU", "Negotiating MTU started") }
-                            .doOnSuccess { ModiLog.i("MTU", "Negotiated MTU: $it") }
-                            .ignoreElement()
-                            .andThen(Single.just(connection))
-                    }
-            }
+            upstream.doOnSubscribe { ModiLog.i("MTU", "MTU negotiation is supported") }
+                .flatMapSingle { connection ->
+                    connection.requestMtu(GATT_MTU_MAXIMUM)
+                        .doOnSubscribe { ModiLog.i("MTU", "Negotiating MTU started") }
+                        .doOnSuccess { ModiLog.i("MTU", "Negotiated MTU: $it") }
+                        .ignoreElement()
+                        .andThen(Single.just(connection))
+                }
+        }
 
 
         bleDevice.observeConnectionStateChanges()
@@ -335,7 +335,6 @@ class ModiManager : ModiFrameNotifier() {
 
     private fun triggerDisconnect() = disconnectTriggerSubject.onNext(Unit)
 
-
     private fun onConnectionStateChange(newState: RxBleConnection.RxBleConnectionState) {
 
         when(newState.name) {
@@ -347,8 +346,6 @@ class ModiManager : ModiFrameNotifier() {
             "CONNECTED"-> {
                 mModiClient!!.stopScan()
                 mModiClient!!.onConnected()
-
-
             }
 
             "DISCONNECTED"-> {
@@ -382,14 +379,10 @@ class ModiManager : ModiFrameNotifier() {
         }
 
         else if (e is BleDisconnectedException){
-
             mModiClient!!.onConnectionFailure(e)
         }
 
-
-
     }
-
 
     fun isConnected() : Boolean {
 

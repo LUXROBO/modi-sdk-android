@@ -26,6 +26,7 @@ import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import java.io.IOException
+import java.lang.NumberFormatException
 import java.net.SocketException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -116,7 +117,9 @@ class ModiManager : ModiFrameNotifier() {
                 }
                 return@setErrorHandler
             }
+
             ModiLog.e("Undeliverable exception received, not sure what to do ${error.message}")
+            onConnectionFailure(error)
         }
 
 
@@ -165,38 +168,44 @@ class ModiManager : ModiFrameNotifier() {
         mRxBleConnection.setupNotification(characteristicUuid)
             .flatMap { it }
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                {
-                    if(it.size == 16 || it.size == 10) {
+            .subscribe {
+                if (it.size == 16 || it.size == 10) {
 
-                        val stringBuilder = StringBuilder(it.size)
-                        for (byteChar in it)
-                            stringBuilder.append(String.format("%02X ", byteChar))
+                    val stringBuilder = StringBuilder(it.size)
+                    for (byteChar in it)
+                        stringBuilder.append(String.format("%02X ", byteChar))
 
+                    if (it[0].toInt() != 0 && stringBuilder.toString().isNotEmpty()) {
+                        var msg = "setupNotification Receive Bytes " + it.size + "("
 
-                        if (it[0].toInt() != 0) {
-                            var msg = "setupNotification Receive Bytes " + it.size + "("
-
-                            for (i in it.indices)
-                                msg += Integer.toHexString(it[i].toInt() and 0xFF) + ", "
+                        try {
+                            for (i in it.indices) {
+                                msg += "${Integer.toHexString(it[i].toInt() and 0xFF)}, "
+                            }
 
                             msg += ")"
 
                             ModiLog.d(msg)
-
                         }
 
-                        mModiClient!!.onReceivedData(stringBuilder.toString())
-                        mModiClient!!.onReceivedData(it)
+                        catch (e: NumberFormatException) {
+                            msg += String(it)
+                            ModiLog.d(msg)
+                        }
 
-                        notifyModiFrame(ModiFrame(it))
                     }
-                },
-                {
-                    ModiLog.e("setupNotification error  $it")
-//                    onConnectionFailure(it)
+
+//                        mModiClient!!.onReceivedData(stringBuilder.toString())
+                    mModiClient!!.onReceivedData(it)
+
+                    notifyModiFrame(ModiFrame(it))
                 }
-            )
+            }
+            /*             {
+                                      ModiLog.e("setupNotification error  $it")
+                  //                    onConnectionFailure(it)
+                                  }*/
+
             .let {
                 notificationDispasable = it
             }
@@ -215,11 +224,11 @@ class ModiManager : ModiFrameNotifier() {
                         msg += ")"
 
                         ModiLog.e(msg)
-
-                        modiId = it
-
                     }
-                 },
+
+                    modiId = it
+
+                },
                 {
                     ModiLog.e("readCharacteristic $it")
                     onConnectionFailure(it)
@@ -262,6 +271,7 @@ class ModiManager : ModiFrameNotifier() {
                 sendData(MODI)
 
                 mModuleManager.setRootModule(getConnectedModiUuid())
+                sendData(ModiProtocol.getVersion(getConnectedModiUuid() and 0xFFF))
 
             }
             ,1000
@@ -312,7 +322,7 @@ class ModiManager : ModiFrameNotifier() {
             .compose(mtuNegotiationObservableTransformer)
             .flatMapSingle {
                 mRxBleConnection = it
-                it.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH,0, TimeUnit.MILLISECONDS)
+                it.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH,1, TimeUnit.MILLISECONDS)
                 it.discoverServices()
             }
             .takeUntil(disconnectTriggerSubject)
@@ -382,6 +392,9 @@ class ModiManager : ModiFrameNotifier() {
             mModiClient!!.onConnectionFailure(e)
         }
 
+        else if (e.cause is NumberFormatException) {
+            mModiClient!!.onConnectionFailure(e)
+        }
     }
 
     fun isConnected() : Boolean {

@@ -17,7 +17,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
 
     private static final byte MODULE_STATE_UNKNOWN = (byte) 0xFF;
     private static final int MODULE_TIMEOUT_PERIOD = 2000;
-    private static final int MODULE_CHECK_PERIOD = 500;
+    private static final int MODULE_CHECK_PERIOD = 3000;
 
     private ConcurrentHashMap<Integer, ModiModule> mModuleMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Integer, ModiModule> mDisabledModuleMap = new ConcurrentHashMap<>();

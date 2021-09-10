@@ -7,7 +7,9 @@ import com.crccalc.CrcCalculator;
 import com.luxrobo.modisdk.callback.ModiCodeUpdaterCallback;
 import com.luxrobo.modisdk.client.ModiFrameObserver;
 import com.luxrobo.modisdk.enums.CodeUpdateError;
+import com.luxrobo.modisdk.enums.ModiKind;
 import com.luxrobo.modisdk.utils.ModiLog;
+import com.luxrobo.modisdk.utils.ModiStringUtil;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -19,6 +21,8 @@ import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 public class ModiCodeUpdater implements ModiFrameObserver {
 
@@ -90,6 +94,7 @@ public class ModiCodeUpdater implements ModiFrameObserver {
     private ArrayList<ModiModule> mUpdateTargets;
     private int RetryMaxCount = 5;
     private UploadProgressNotifier mUploadProgressNotifier = null;
+    private ModiKind modiKind = ModiKind.MODI_PLUS;
 
     // TODO: Thread deadlock 해결
     private Thread mCodeUpdateThread;
@@ -143,12 +148,55 @@ public class ModiCodeUpdater implements ModiFrameObserver {
         startThread();
     }
 
+    public void startUpdate_plus(@NonNull ModiStream stream, @NonNull ModiCodeUpdaterCallback callback) {
+
+        if (mRunningFlag == true) {
+            callback.onUpdateFailed(CodeUpdateError.CODE_NOW_UPDATING, "Code Update Task is running");
+            return;
+        }
+
+        modiKind = ModiKind.MODI_PLUS;
+        mUserEnable = false;
+        mPnpEnable = false;
+
+        mStream = stream;
+        mUpdateTargets = mManager.moduleMgr().getModules();
+        mCallback = callback;
+        mCompleteFlag = false;
+
+        startThread();
+    }
+
     public void startReset(@NonNull ModiCodeUpdaterCallback callback) {
 
         if (mRunningFlag == true) {
             callback.onUpdateFailed(CodeUpdateError.CODE_NOW_UPDATING, "Code Update Task is running");
             return;
         }
+
+        mUserEnable = false;
+        mPnpEnable = true;
+
+        int uuid = mManager.getConnectedModiUuid();
+
+
+        mStream = ModiStream.makeStream(uuid & 0xFFF, 0, ModiStream.STREAM_TYPE.INTERPRETER, new byte[0]);
+
+        mUpdateTargets = mManager.moduleMgr().getModules();
+        mCallback = callback;
+        mCompleteFlag = false;
+
+        startThread();
+    }
+
+    public void startReset_plus(@NonNull ModiCodeUpdaterCallback callback) {
+
+        if (mRunningFlag == true) {
+            callback.onUpdateFailed(CodeUpdateError.CODE_NOW_UPDATING, "Code Update Task is running");
+            return;
+        }
+
+        modiKind = ModiKind.MODI_PLUS;
 
         mUserEnable = false;
         mPnpEnable = true;
@@ -254,7 +302,7 @@ public class ModiCodeUpdater implements ModiFrameObserver {
                             throw e;
                         }
 
-                        ModiLog.e("setPlugAndPlayModule Retry... count is " + retry);
+                        ModiLog.e("setPlugAndPlayModule Retry... count is " + retry + " error : " + e.getMessage());
                     }
                 }
 
@@ -263,6 +311,7 @@ public class ModiCodeUpdater implements ModiFrameObserver {
 
             requestStream(stream);
             send(ModiProtocol.setModuleState(0xFFF, ModiProtocol.MODULE_STATE.RESET));
+            send(ModiProtocol.setStartInterpreter());
             Thread.sleep(200);
             progressNotifierComplete();
 
@@ -354,7 +403,7 @@ public class ModiCodeUpdater implements ModiFrameObserver {
         // change update mode
         mRecvQueue.clear();
         send(ModiProtocol.setModuleState(targetModuleKey, ModiProtocol.MODULE_STATE.UPDATE));
-        ModiFrame res = waitForModiFrame(1200, getModuleStateFilter(targetModuleKey));
+        ModiFrame res = waitForModiFrame(5000, getModuleStateFilter(targetModuleKey));
         if (res.data()[6] != ModiProtocol.MODULE_WARNING.FIRMWARE.value) {
             throw new Exception("module is not update mode, " + res.data()[6]);
         }
@@ -364,7 +413,7 @@ public class ModiCodeUpdater implements ModiFrameObserver {
         // change update ready
         mRecvQueue.clear();
         send(ModiProtocol.setModuleState(targetModuleKey, ModiProtocol.MODULE_STATE.UPDATE_READY));
-        res = waitForModiFrame(1200, new ModiFrameFilter() {
+        res = waitForModiFrame(5000, new ModiFrameFilter() {
             @Override
             public boolean filter(ModiFrame frame) {
                 if (frame.cmd() == 0x0A && frame.sid() == targetModuleKey && frame.data()[6] != 1) {
@@ -476,7 +525,24 @@ public class ModiCodeUpdater implements ModiFrameObserver {
         // Send Firmware Erase
         mRecvQueue.clear();
 
-        send(ModiProtocol.firmwareCommand(targetModuleKey, ModiProtocol.FLASH_CMD.ERASE, 0x0801F800, 0));
+        int address = 0x0800f800;
+        int moduleCase = 1;
+
+        switch (modiKind) {
+
+            case MODI:
+                send(ModiProtocol.firmwareCommand(targetModuleKey, ModiProtocol.FLASH_CMD.ERASE, address, 1));
+
+                break;
+            case MODI_PLUS:
+
+                if (module.type.equals("Network") || module.type.equals("Dial") || module.type.equals("Environment") || module.type.equals("Speaker")) {
+                    address = 0x0801F800;
+                    moduleCase = 0;
+                }
+
+                send(ModiProtocol.firmwareCommand(targetModuleKey, ModiProtocol.FLASH_CMD.ERASE, address, 1));
+        }
 
         // Wait status response
         res = waitForModiFrame(5000, getFirmwareFilter(targetModuleKey));
@@ -504,23 +570,65 @@ public class ModiCodeUpdater implements ModiFrameObserver {
         pnpData[6] = version_buffer.get(0);
         pnpData[7] = version_buffer.get(1);
 
+        byte[] bootingAddress = new byte[8];
+
+        bootingAddress[0] = (byte) 0x00;
+        bootingAddress[1] = (byte) 0x00;
+        bootingAddress[2] = (byte) 0x00;
+        bootingAddress[3] = (byte) 0x00;
+
+        bootingAddress[4] = (byte) 0x00;
+        bootingAddress[6] = (byte) 0x00;
+        bootingAddress[7] = (byte) 0x08;
+
+        if(moduleCase == 0) {
+
+            bootingAddress[5] = (byte) 0x90;
+
+        } else {
+
+            bootingAddress[5] = (byte) 0x4C;
+
+        }
+
         send(ModiProtocol.firmwareData(targetModuleKey, 0, pnpData));
 
         byte[] reverseData = reverseBlock(pnpData);
 
-        String revlog = "";
-        for (int i = 0; i < reverseData.length; i++) {
-            revlog += Integer.toHexString((int) reverseData[i] & 0xFF) + ", ";
+        long crcValue1 = calculateCrc32(reverseData,0);
+
+        StringBuilder revlog = new StringBuilder();
+
+        for (byte datum : reverseData) {
+            revlog.append(Integer.toHexString((int) datum & 0xFF)).append(", ");
         }
 
-        ModiLog.d("reverse data : " + revlog);
-
-        long crcValue = calculateCrc32(reverseData);
-
-        ModiLog.d("crc : " + Long.toHexString(crcValue));
-
         mRecvQueue.clear();
-        send(ModiProtocol.firmwareCommand(targetModuleKey, ModiProtocol.FLASH_CMD.CHECK_CRC, 0x0801F800, (int) crcValue));
+
+        switch (modiKind) {
+
+            case MODI:
+
+                send(ModiProtocol.firmwareCommand(targetModuleKey, ModiProtocol.FLASH_CMD.CHECK_CRC, address, (int)crcValue1));
+
+                break;
+            case MODI_PLUS:
+
+                send(ModiProtocol.firmwareData(targetModuleKey, 1, bootingAddress));
+
+                reverseData = reverseBlock(bootingAddress);
+
+                revlog = new StringBuilder();
+
+                for (byte datum : reverseData) {
+                    revlog.append(Integer.toHexString((int) datum & 0xFF)).append(", ");
+                }
+
+                long crcValue2 = calculateCrc32(reverseData,crcValue1);
+
+                mRecvQueue.clear();
+                send(ModiProtocol.firmwareCommand(targetModuleKey, ModiProtocol.FLASH_CMD.CHECK_CRC, address, (int)crcValue2));
+        }
 
         res = waitForModiFrame(5000, getFirmwareFilter(targetModuleKey));
         if (res.data()[4] != 0x05) {
@@ -530,11 +638,11 @@ public class ModiCodeUpdater implements ModiFrameObserver {
         ModiLog.i(module.getString() + "flash verification success");
     }
 
-    private long calculateCrc32(byte[] data) {
+    private long calculateCrc32(byte[] data, long crc) {
         // Send Firmware Verify
         CrcCalculator crc_calc = new CrcCalculator(Crc32.Crc32Mpeg2);
 
-        long value = crc_calc.Calc(data, 0, data.length);
+        long value = crc_calc.Calc(data, 0, data.length, crc);
 
         return value;
     }

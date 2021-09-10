@@ -109,7 +109,7 @@ class ModiManager : ModiFrameNotifier() {
 
                 return@setErrorHandler
             }
-            if (error is IllegalStateException) {
+            if (error is IllegalStateException ) {
                 // that's a bug in RxJava or in a custom operator
                 if(Thread.currentThread().uncaughtExceptionHandler != null) {
                     Thread.currentThread().uncaughtExceptionHandler!!
@@ -151,7 +151,10 @@ class ModiManager : ModiFrameNotifier() {
             scanResult.observeOn(AndroidSchedulers.mainThread())
                 .doFinally { scanDispose() }
                 .doOnSubscribe { mModiClient!!.onScan() }
-                .subscribe({ mModiClient!!.onFoundDevice(it) }, { onScanFailure(it) })
+                .subscribe({ mModiClient!!.onFoundDevice(it) }, {
+                    ModiLog.e("scanResult.observeOn onScanFailure ${it.message}")
+                    onScanFailure(it)
+                })
                 .let { scanDisposable = it }
         }
 
@@ -168,7 +171,7 @@ class ModiManager : ModiFrameNotifier() {
         mRxBleConnection.setupNotification(characteristicUuid)
             .flatMap { it }
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
+            .subscribe ({
                 if (it.size == 16 || it.size == 10) {
 
                     val stringBuilder = StringBuilder(it.size)
@@ -190,7 +193,7 @@ class ModiManager : ModiFrameNotifier() {
 
                         catch (e: NumberFormatException) {
                             msg += String(it)
-                            ModiLog.d(msg)
+                            ModiLog.e(msg)
                         }
 
                     }
@@ -200,11 +203,11 @@ class ModiManager : ModiFrameNotifier() {
 
                     notifyModiFrame(ModiFrame(it))
                 }
-            }
-            /*             {
-                                      ModiLog.e("setupNotification error  $it")
-                  //                    onConnectionFailure(it)
-                                  }*/
+            },
+                 {
+                              ModiLog.e("setupNotification error  $it")
+                              onConnectionFailure(it)
+                          })
 
             .let {
                 notificationDispasable = it
@@ -215,19 +218,17 @@ class ModiManager : ModiFrameNotifier() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 {
-                    if (it[0].toInt() != 0) {
-                        var msg = "readCharacteristic Receive Bytes " + it.size + "("
 
-                        for (i in it.indices)
-                            msg += Integer.toHexString(it[i].toInt() and 0xFF) + ", "
+                    var msg = "readCharacteristic Receive Bytes " + it.size + "("
 
-                        msg += ")"
+                    for (i in it.indices)
+                        msg += Integer.toHexString(it[i].toInt() and 0xFF) + ", "
 
-                        ModiLog.e(msg)
-                    }
+                    msg += ")"
+
+                    ModiLog.d(msg)
 
                     modiId = it
-
                 },
                 {
                     ModiLog.e("readCharacteristic $it")

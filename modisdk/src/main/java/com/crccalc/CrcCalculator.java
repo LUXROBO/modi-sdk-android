@@ -25,10 +25,19 @@ public class CrcCalculator {
         CreateTable();
     }
 
-    public long Calc(byte[] data, int offset, int length)
+    public long Calc(byte[] data, int offset, int length, long input)
     {
-        long init = Parameters.RefOut ? CrcHelper.ReverseBits(Parameters.Init, HashSize) : Parameters.Init;
-        long hash = ComputeCrc(init, data, offset, length);
+        long crc;
+
+        if (input == 0) {
+            crc = Parameters.RefOut ? CrcHelper.ReverseBits(Parameters.Init, HashSize) : Parameters.Init;
+        } else {
+            crc = input;
+        }
+
+
+        long hash = ComputeCrc(crc, data, offset, length);
+
         return (hash ^ Parameters.XorOut) & _mask;
     }
 

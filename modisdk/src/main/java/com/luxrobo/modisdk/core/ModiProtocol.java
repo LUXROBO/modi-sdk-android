@@ -136,6 +136,17 @@ public class ModiProtocol {
         return ModiFrame.makeFrame(0x09, 0, module_key, data);
     }
 
+    public static byte[] setStartInterpreter() {
+        byte[] data = new byte[8];
+
+        for (int i = 0; i < 8; i ++) {
+            data[i] = 0;
+        }
+
+
+        return ModiFrame.makeFrame(0xA0, 0x51, 0xFFF, data);
+    }
+
     public static byte[] resetNetworkModule(int moduleKey) {
         byte[] data = new byte[8];
 

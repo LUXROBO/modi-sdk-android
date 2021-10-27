@@ -22,7 +22,8 @@ class ScanActivity : AppCompatActivity() {
 
     private lateinit var adapter                : ScanAdapter
 
-    private val         data            = mutableListOf<ScanResult>()
+    private var scanData                  = listOf<ScanResult>()
+    private var scanResultData            = mutableListOf<ScanResult>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,10 +53,12 @@ class ScanActivity : AppCompatActivity() {
 
         binding.btnScan.setOnClickListener {
 
+            scanResultData.clear()
             adapter.removeAll()
 
             if(!mModiManager.isScanning) {
 
+                mModiManager.turnOnBluetooth()
                 mModiManager.scan()
 
                 return@setOnClickListener
@@ -73,46 +76,56 @@ class ScanActivity : AppCompatActivity() {
 
             override fun onFoundDevice(bleScanResult: ScanResult?) {
 
-                data.withIndex()
-                    .firstOrNull { it.value.bleDevice.macAddress == bleScanResult!!.bleDevice.macAddress }
-                    ?.let {
-                        // device already in data list => update
-                        data[it.index] = bleScanResult!!
-                        adapter.setItemList(data)
 
-                    }
-                    ?: run {
-                        // new device => add to data list
-                        with(data) {
-                            add(bleScanResult!!)
-                            sortBy { it.bleDevice.macAddress }
-                        }
-                    }
+               scanData
+                   .withIndex()
+                   .firstOrNull {
+                       it.value.bleDevice == bleScanResult?.bleDevice
+                   }
+                   ?.let {
+
+                       scanResultData[it.index] = bleScanResult!!
+                   }
+                   ?: run {
+                       with(scanResultData) {
+
+                           if(bleScanResult?.bleDevice?.name?.startsWith("MODI+") == true) {
+                               add(bleScanResult)
+
+                               sortBy { it.bleDevice.macAddress }
+
+                               scanData = this
+                               adapter.setItemList(this)
+
+                           }
+
+                       }
+                   }
 
             }
 
             override fun onDiscoveredService() {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
             }
 
             override fun onDiscoverServiceFailure() {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
             }
 
             override fun onConnecting() {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
             }
 
             override fun onConnected() {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
             }
 
             override fun onConnectionFailure(e: Throwable?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
             }
 
             override fun onDisconnected() {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
             }
 
             override fun onScan() {
@@ -131,19 +144,19 @@ class ScanActivity : AppCompatActivity() {
             }
 
             override fun onReceivedData(data: String?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
             }
 
             override fun onReceivedData(data: ByteArray?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
             }
 
             override fun onOffEvent() {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
             }
 
             override fun disconnectedByModulePowerOff() {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
             }
 
         }
@@ -157,10 +170,13 @@ class ScanActivity : AppCompatActivity() {
 
             override fun onItemClick(deviceAddress: String) {
 
-                //move to connect activity
-                val intent = Intent(this@ScanActivity, ConnectActivity::class.java)
-                intent.putExtra("deviceAddress", deviceAddress)
-                startActivity(intent)
+                ModiLog.d("onItemClick $deviceAddress")
+
+                mModiManager.connect(deviceAddress)
+//                //move to connect activity
+//                val intent = Intent(this@ScanActivity, ConnectActivity::class.java)
+//                intent.putExtra("deviceAddress", deviceAddress)
+//                startActivity(intent)
             }
         })
 

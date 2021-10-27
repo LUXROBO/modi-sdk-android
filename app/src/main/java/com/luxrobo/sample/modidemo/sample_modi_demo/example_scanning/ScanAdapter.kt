@@ -46,6 +46,8 @@ class ScanAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         binding.root.setOnClickListener {
 
+            ModiLog.d("binding.root.setOnClickListener $listener")
+
             if(listener != null) {
                 listener?.onItemClick(item.bleDevice.macAddress)
             }

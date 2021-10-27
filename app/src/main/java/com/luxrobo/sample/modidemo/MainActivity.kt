@@ -1,10 +1,17 @@
 package com.luxrobo.sample.modidemo
 
+import android.Manifest
+import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.luxrobo.modisdk.utils.ModiLog
 import com.luxrobo.sample.modidemo.databinding.ActivityMainBinding
 import com.luxrobo.sample.modidemo.sample_modi_demo.example_scanning.ScanActivity
 
@@ -23,6 +30,8 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         initUI()
+
+        permissionCheck()
     }
 
     private fun initUI() {
@@ -30,6 +39,37 @@ class MainActivity : AppCompatActivity() {
 
         setAdapter()
 
+    }
+
+    private fun permissionCheck() {
+
+        ModiLog.d("kstlove permissionCheck()")
+
+        if (Build.VERSION.SDK_INT >= 23) {
+            var permissionCheck = ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION)
+
+            val permissionList: ArrayList<String> = arrayListOf()
+
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionList.add(ACCESS_FINE_LOCATION)
+            }
+
+
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionList.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+            }
+
+            if (permissionList.isNotEmpty()) {
+                var strArray = arrayOfNulls<String>(permissionList.size)
+                strArray = permissionList.toArray(strArray)
+
+                ActivityCompat.requestPermissions(this, strArray, 1000)
+            }
+
+
+        }
     }
 
     private fun setAdapter() {

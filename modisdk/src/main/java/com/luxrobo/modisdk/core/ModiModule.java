@@ -17,8 +17,12 @@ public class ModiModule {
     public static final String TYPE_IR = "Ir";
     public static final String TYPE_DISPLAY = "Display";
     public static final String TYPE_MOTOR = "Motor";
+    public static final String TYPE_MOTOR_B = "MotorB";
     public static final String TYPE_LED = "Led";
     public static final String TYPE_SPEAKER = "Speaker";
+    public static final String TYPE_BATTERY = "Battery";
+    public static final String TYPE_JOYSTICK= "Joystick";
+    public static final String TYPE_TOF= "Tof";
 
     public int version;
     public int typeCode;
@@ -42,6 +46,7 @@ public class ModiModule {
     public static String typeCodeToString(int typeCode) {
         switch (typeCode) {
             case 0x0000: return TYPE_NETWORK;
+            case 0x0010: return TYPE_BATTERY;
             case 0x2000: return TYPE_ENVIRONMENT;
             case 0x2010: return TYPE_GYRO;
             case 0x2020: return TYPE_MIC;
@@ -49,10 +54,14 @@ public class ModiModule {
             case 0x2040: return TYPE_DIAL;
             case 0x2050: return TYPE_ULTRASONIC;
             case 0x2060: return TYPE_IR;
+            case 0x2070: return TYPE_JOYSTICK;
+            case 0x2080: return TYPE_TOF;
             case 0x4000: return TYPE_DISPLAY;
             case 0x4010: return TYPE_MOTOR;
+            case 0x4011: return TYPE_MOTOR_B;
             case 0x4020: return TYPE_LED;
             case 0x4030: return TYPE_SPEAKER;
+
             default:
                 break;
         }

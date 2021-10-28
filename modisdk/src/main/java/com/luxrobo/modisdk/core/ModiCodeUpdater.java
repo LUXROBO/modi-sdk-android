@@ -587,7 +587,7 @@ public class ModiCodeUpdater implements ModiFrameObserver {
 
         } else {
 
-            bootingAddress[5] = (byte) 0x4C;
+            bootingAddress[5] = (byte) 0x50;
 
         }
 

@@ -9,20 +9,16 @@ import com.luxrobo.modisdk.client.ModiFrameObserver;
 import com.luxrobo.modisdk.enums.CodeUpdateError;
 import com.luxrobo.modisdk.enums.ModiKind;
 import com.luxrobo.modisdk.utils.ModiLog;
-import com.luxrobo.modisdk.utils.ModiStringUtil;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.zip.CRC32;
-import java.util.zip.Checksum;
 
 public class ModiCodeUpdater implements ModiFrameObserver {
 
@@ -94,7 +90,7 @@ public class ModiCodeUpdater implements ModiFrameObserver {
     private ArrayList<ModiModule> mUpdateTargets;
     private int RetryMaxCount = 5;
     private UploadProgressNotifier mUploadProgressNotifier = null;
-    private ModiKind modiKind = ModiKind.MODI_PLUS;
+    private ModiKind modiKind = ModiKind.MODI;
 
     // TODO: Thread deadlock 해결
     private Thread mCodeUpdateThread;

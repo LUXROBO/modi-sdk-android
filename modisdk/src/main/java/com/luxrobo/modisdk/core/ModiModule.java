@@ -23,6 +23,7 @@ public class ModiModule {
     public static final String TYPE_BATTERY = "Battery";
     public static final String TYPE_JOYSTICK= "Joystick";
     public static final String TYPE_TOF= "Tof";
+    public static final String TYPE_IMU= "IMU";
 
     public int version;
     public int typeCode;
@@ -48,7 +49,7 @@ public class ModiModule {
             case 0x0000: return TYPE_NETWORK;
             case 0x0010: return TYPE_BATTERY;
             case 0x2000: return TYPE_ENVIRONMENT;
-            case 0x2010: return TYPE_GYRO;
+            case 0x2010: return TYPE_IMU;
             case 0x2020: return TYPE_MIC;
             case 0x2030: return TYPE_BUTTON;
             case 0x2040: return TYPE_DIAL;

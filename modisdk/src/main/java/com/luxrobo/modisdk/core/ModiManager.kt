@@ -434,7 +434,11 @@ class ModiManager : ModiFrameNotifier() {
             mModiClient!!.onConnectionFailure(e)
         }
 
-        else if (e.cause is NumberFormatException) {
+        else if (e is NumberFormatException) {
+
+            val versionData = "0.0.0".toByteArray()
+
+            ModiProtocol.setVersion(getConnectedModiUuid() and 0xFFF, versionData)
             mModiClient!!.onConnectionFailure(e)
         }
     }

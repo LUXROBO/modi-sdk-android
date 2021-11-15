@@ -173,69 +173,35 @@ class ModiManager : ModiFrameNotifier() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe ({
 
-                if (it.size == 16 || it.size == 10) {
 
-                   /* var msg = "setupNotification Receive Bytes " + it.size + "("
+
+                val stringBuilder = StringBuilder(it.size)
+                for (byteChar in it)
+                    stringBuilder.append(String.format("%02X ", byteChar))
+
+                if (it[0].toInt() != 0 && stringBuilder.toString().isNotEmpty()) {
+                    var msg = "setupNotification Receive Bytes " + it.size + "("
 
                     try {
-
-                        val stringBuilder = StringBuilder(it.size)
-                        for (byteChar in it) {
-                            stringBuilder.append(String.format("%02X ", byteChar))
+                        for (i in it.indices) {
+                            msg += "${Integer.toHexString(it[i].toInt() and 0xFF)}, "
                         }
 
-                        if (it[0].toInt() != 0 && stringBuilder.toString().isNotEmpty()) {
+                        msg += ")"
 
-                            ModiLog.d("setupNotification msg2  ${it.size}")
-
-                            for (i in it.indices) {
-                                msg += "${Integer.toHexString(it[i].toInt() and 0xFF)}, "
-                            }
-
-                            msg += ")"
-
-                            ModiLog.d(msg)
-                        }
-
-    //                        mModiClient!!.onReceivedData(stringBuilder.toString())
-                            mModiClient!!.onReceivedData(it)
-
-                            notifyModiFrame(ModiFrame(it))
-                        }
-
-                        catch (e: NumberFormatException) {
-                            msg += String(it)
-                            ModiLog.e(msg)
-                        }
-
-                        catch (e : Exception) {
-                            e.printStackTrace()
-                        }*/
-
-
-                    val stringBuilder = StringBuilder(it.size)
-                    for (byteChar in it)
-                        stringBuilder.append(String.format("%02X ", byteChar))
-
-                    if (it[0].toInt() != 0 && stringBuilder.toString().isNotEmpty()) {
-                        var msg = "setupNotification Receive Bytes " + it.size + "("
-
-                        try {
-                            for (i in it.indices) {
-                                msg += "${Integer.toHexString(it[i].toInt() and 0xFF)}, "
-                            }
-
-                            msg += ")"
-
-                            ModiLog.d(msg)
-                        }
-
-                        catch (e: NumberFormatException) {
-                            msg += String(it)
-                            ModiLog.e(msg)
-                        }
-
+                        ModiLog.d(msg)
                     }
+
+                    catch (e: NumberFormatException) {
+                        msg += String(it)
+                        ModiLog.e(msg)
+                    }
+
+                }
+
+                if (it.size == 16 || it.size == 10) {
+
+
 
 //                        mModiClient!!.onReceivedData(stringBuilder.toString())
                     mModiClient!!.onReceivedData(it)
@@ -437,9 +403,8 @@ class ModiManager : ModiFrameNotifier() {
         else if (e is NumberFormatException) {
 
             val versionData = "0.0.0".toByteArray()
-
             ModiProtocol.setVersion(getConnectedModiUuid() and 0xFFF, versionData)
-            mModiClient!!.onConnectionFailure(e)
+
         }
     }
 

@@ -168,12 +168,11 @@ class ModiManager : ModiFrameNotifier() {
     }
 
     private fun startNotification() {
+
         mRxBleConnection.setupNotification(characteristicUuid)
             .flatMap { it }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe ({
-
-
 
                 val stringBuilder = StringBuilder(it.size)
                 for (byteChar in it)
@@ -402,8 +401,23 @@ class ModiManager : ModiFrameNotifier() {
 
         else if (e is NumberFormatException) {
 
-            val versionData = "0.0.0".toByteArray()
-            ModiProtocol.setVersion(getConnectedModiUuid() and 0xFFF, versionData)
+            val data = ByteArray(8)
+            val version = "4.0.0"
+            var tempVer = "4.0.0"
+
+            while (8 > tempVer.length) {
+                tempVer = "0$tempVer"
+                data[8-tempVer.length] = 0x00
+            }
+
+            val offset = tempVer.length - version.length
+
+            for( i in 8 - version.length until 8) {
+
+                data[i] = version[i - offset].toByte()
+            }
+
+            ModiProtocol.setVersion(getConnectedModiUuid() and 0xFFF, data)
 
         }
     }

@@ -7,6 +7,7 @@ import android.os.ParcelUuid
 import com.luxrobo.modisdk.client.ModiClient
 import com.luxrobo.modisdk.utils.ModiLog
 import com.luxrobo.modisdk.utils.isConnected
+import com.polidea.rxandroidble2.NotificationSetupMode
 import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.RxBleConnection
 import com.polidea.rxandroidble2.RxBleConnection.GATT_MTU_MAXIMUM
@@ -167,7 +168,6 @@ class ModiManager : ModiFrameNotifier() {
     }
 
     private fun startNotification() {
-
         mRxBleConnection.setupNotification(characteristicUuid)
             .flatMap { it }
             .observeOn(AndroidSchedulers.mainThread())

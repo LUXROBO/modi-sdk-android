@@ -307,8 +307,8 @@ public class ModiCodeUpdater implements ModiFrameObserver {
 
             requestStream(stream);
             send(ModiProtocol.setModuleState(0xFFF, ModiProtocol.MODULE_STATE.RESET));
-            send(ModiProtocol.setStartInterpreter());
             Thread.sleep(200);
+            send(ModiProtocol.setStartInterpreter());
             progressNotifierComplete();
 
             if (mCallback != null) {

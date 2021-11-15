@@ -20,7 +20,7 @@ private const val SAMPLE_MODI_DEMO               = 0
 private const val SAMPLE_MODI_RX_DEMO            = 1
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
@@ -110,4 +110,6 @@ class MainActivity : AppCompatActivity() {
 
         return arrayList
     }
+
+
 }

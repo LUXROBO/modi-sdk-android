@@ -532,7 +532,7 @@ public class ModiCodeUpdater implements ModiFrameObserver {
                 break;
             case MODI_PLUS:
 
-                if (module.type.equals("Network") || module.type.equals("Dial") || module.type.equals("Environment") || module.type.equals("Speaker")) {
+                if (module.type.equals("Network") || module.type.equals("Display") || module.type.equals("Environment") || module.type.equals("Speaker")) {
                     address = 0x0801F800;
                     moduleCase = 0;
                 }

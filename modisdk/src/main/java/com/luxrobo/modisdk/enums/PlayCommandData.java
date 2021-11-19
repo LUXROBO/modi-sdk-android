@@ -4,10 +4,10 @@ public enum PlayCommandData {
     PRESSED(100),
     UNPRESSED(0),
     JOYSTICK_UNPRESSED(0),
-    JOYSTICK_UP(0),
-    JOYSTICK_DOWN(0),
-    JOYSTICK_LEFT(0),
-    JOYSTICK_RIGHT(0),
+    JOYSTICK_UP(20),
+    JOYSTICK_DOWN(30),
+    JOYSTICK_LEFT(40),
+    JOYSTICK_RIGHT(50),
     ;
     public int value;
 

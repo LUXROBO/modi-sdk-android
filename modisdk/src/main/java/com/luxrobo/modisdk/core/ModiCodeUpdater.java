@@ -9,20 +9,16 @@ import com.luxrobo.modisdk.client.ModiFrameObserver;
 import com.luxrobo.modisdk.enums.CodeUpdateError;
 import com.luxrobo.modisdk.enums.ModiKind;
 import com.luxrobo.modisdk.utils.ModiLog;
-import com.luxrobo.modisdk.utils.ModiStringUtil;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.zip.CRC32;
-import java.util.zip.Checksum;
 
 public class ModiCodeUpdater implements ModiFrameObserver {
 
@@ -94,7 +90,7 @@ public class ModiCodeUpdater implements ModiFrameObserver {
     private ArrayList<ModiModule> mUpdateTargets;
     private int RetryMaxCount = 5;
     private UploadProgressNotifier mUploadProgressNotifier = null;
-    private ModiKind modiKind = ModiKind.MODI_PLUS;
+    private ModiKind modiKind = ModiKind.MODI;
 
     // TODO: Thread deadlock 해결
     private Thread mCodeUpdateThread;
@@ -311,8 +307,8 @@ public class ModiCodeUpdater implements ModiFrameObserver {
 
             requestStream(stream);
             send(ModiProtocol.setModuleState(0xFFF, ModiProtocol.MODULE_STATE.RESET));
-            send(ModiProtocol.setStartInterpreter());
             Thread.sleep(200);
+            send(ModiProtocol.setStartInterpreter());
             progressNotifierComplete();
 
             if (mCallback != null) {
@@ -536,7 +532,7 @@ public class ModiCodeUpdater implements ModiFrameObserver {
                 break;
             case MODI_PLUS:
 
-                if (module.type.equals("Network") || module.type.equals("Dial") || module.type.equals("Environment") || module.type.equals("Speaker")) {
+                if (module.type.equals("Network") || module.type.equals("Display") || module.type.equals("Environment") || module.type.equals("Speaker")) {
                     address = 0x0801F800;
                     moduleCase = 0;
                 }
@@ -587,7 +583,7 @@ public class ModiCodeUpdater implements ModiFrameObserver {
 
         } else {
 
-            bootingAddress[5] = (byte) 0x4C;
+            bootingAddress[5] = (byte) 0x50;
 
         }
 

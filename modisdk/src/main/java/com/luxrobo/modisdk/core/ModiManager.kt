@@ -7,6 +7,7 @@ import android.os.ParcelUuid
 import com.luxrobo.modisdk.client.ModiClient
 import com.luxrobo.modisdk.utils.ModiLog
 import com.luxrobo.modisdk.utils.isConnected
+import com.polidea.rxandroidble2.NotificationSetupMode
 import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.RxBleConnection
 import com.polidea.rxandroidble2.RxBleConnection.GATT_MTU_MAXIMUM
@@ -173,69 +174,33 @@ class ModiManager : ModiFrameNotifier() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe ({
 
-                if (it.size == 16 || it.size == 10) {
+                val stringBuilder = StringBuilder(it.size)
+                for (byteChar in it)
+                    stringBuilder.append(String.format("%02X ", byteChar))
 
-                   /* var msg = "setupNotification Receive Bytes " + it.size + "("
+                if (it[0].toInt() != 0 && stringBuilder.toString().isNotEmpty()) {
+                    var msg = "setupNotification Receive Bytes " + it.size + "("
 
                     try {
-
-                        val stringBuilder = StringBuilder(it.size)
-                        for (byteChar in it) {
-                            stringBuilder.append(String.format("%02X ", byteChar))
+                        for (i in it.indices) {
+                            msg += "${Integer.toHexString(it[i].toInt() and 0xFF)}, "
                         }
 
-                        if (it[0].toInt() != 0 && stringBuilder.toString().isNotEmpty()) {
+                        msg += ")"
 
-                            ModiLog.d("setupNotification msg2  ${it.size}")
-
-                            for (i in it.indices) {
-                                msg += "${Integer.toHexString(it[i].toInt() and 0xFF)}, "
-                            }
-
-                            msg += ")"
-
-                            ModiLog.d(msg)
-                        }
-
-    //                        mModiClient!!.onReceivedData(stringBuilder.toString())
-                            mModiClient!!.onReceivedData(it)
-
-                            notifyModiFrame(ModiFrame(it))
-                        }
-
-                        catch (e: NumberFormatException) {
-                            msg += String(it)
-                            ModiLog.e(msg)
-                        }
-
-                        catch (e : Exception) {
-                            e.printStackTrace()
-                        }*/
-
-
-                    val stringBuilder = StringBuilder(it.size)
-                    for (byteChar in it)
-                        stringBuilder.append(String.format("%02X ", byteChar))
-
-                    if (it[0].toInt() != 0 && stringBuilder.toString().isNotEmpty()) {
-                        var msg = "setupNotification Receive Bytes " + it.size + "("
-
-                        try {
-                            for (i in it.indices) {
-                                msg += "${Integer.toHexString(it[i].toInt() and 0xFF)}, "
-                            }
-
-                            msg += ")"
-
-                            ModiLog.d(msg)
-                        }
-
-                        catch (e: NumberFormatException) {
-                            msg += String(it)
-                            ModiLog.e(msg)
-                        }
-
+                        ModiLog.d(msg)
                     }
+
+                    catch (e: NumberFormatException) {
+                        msg += String(it)
+                        ModiLog.e(msg)
+                    }
+
+                }
+
+                if (it.size == 16 || it.size == 10) {
+
+
 
 //                        mModiClient!!.onReceivedData(stringBuilder.toString())
                     mModiClient!!.onReceivedData(it)
@@ -434,8 +399,26 @@ class ModiManager : ModiFrameNotifier() {
             mModiClient!!.onConnectionFailure(e)
         }
 
-        else if (e.cause is NumberFormatException) {
-            mModiClient!!.onConnectionFailure(e)
+        else if (e is NumberFormatException) {
+
+            val data = ByteArray(8)
+            val version = "4.0.0"
+            var tempVer = "4.0.0"
+
+            while (8 > tempVer.length) {
+                tempVer = "0$tempVer"
+                data[8-tempVer.length] = 0x00
+            }
+
+            val offset = tempVer.length - version.length
+
+            for( i in 8 - version.length until 8) {
+
+                data[i] = version[i - offset].toByte()
+            }
+
+            ModiProtocol.setVersion(getConnectedModiUuid() and 0xFFF, data)
+
         }
     }
 

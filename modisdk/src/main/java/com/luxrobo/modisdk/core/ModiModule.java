@@ -83,6 +83,11 @@ public class ModiModule {
     public String getString() {
 
         String name = type.toLowerCase()+"0";
+
+        if(typeCode == 0x4011) {
+            name = type.toLowerCase()+"1";
+        }
+
         return String.format("this.%s = %s(0x%04X%08X);\n", name, type, typeCode, uuid);
 //        return String.format("%s (%04X%8X)", type, typeCode, uuid);
     }

@@ -17,7 +17,7 @@ public class ModiModule {
     public static final String TYPE_IR = "Ir";
     public static final String TYPE_DISPLAY = "Display";
     public static final String TYPE_MOTOR = "Motor";
-    public static final String TYPE_MOTOR_B = "MotorB";
+    public static final String TYPE_MOTOR_B = "Motor";
     public static final String TYPE_LED = "Led";
     public static final String TYPE_SPEAKER = "Speaker";
     public static final String TYPE_BATTERY = "Battery";

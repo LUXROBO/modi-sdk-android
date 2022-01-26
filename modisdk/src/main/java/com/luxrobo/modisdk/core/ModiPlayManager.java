@@ -49,7 +49,22 @@ public class ModiPlayManager implements ModiFrameObserver {
             int target = mModiManager.getConnectedModiUuid() & 0xFFF;
 
             byte[] frameData = new byte[8];
-            frameData[0] = (byte) commandData.value;
+
+            switch (command) {
+                case BUTTON_CLICK:
+                    frameData[2] = (byte) commandData.value;
+                    break;
+                case BUTTON_DOUBLE_CLICK:
+                    frameData[4] = (byte) commandData.value;
+                    break;
+                case BUTTON_PRESS_STATUS:
+                    frameData[0] = (byte) commandData.value;
+                    break;
+                default:
+                    frameData[0] = (byte) commandData.value;
+                    break;
+            }
+
             frameData[7] = (byte) options;
 
 //            byte[] did = new byte[2];

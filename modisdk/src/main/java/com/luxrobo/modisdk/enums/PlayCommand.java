@@ -8,8 +8,8 @@ public enum PlayCommand {
     LEFT_SLIDER(0x0005),
     RIGHT_SLIDER(0x0006),
     TIMER(0x0007),
-    BUTTON_CLICK(0x0102),
-    BUTTON_DOUBLE_CLICK(0x0103),
+    BUTTON_CLICK(0x0003),
+    BUTTON_DOUBLE_CLICK(0x0003),
     TOGGLE(0x0104),
     ;
     public int value;

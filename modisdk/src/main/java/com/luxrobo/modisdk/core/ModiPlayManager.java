@@ -2,6 +2,7 @@ package com.luxrobo.modisdk.core;
 
 import android.os.Handler;
 import android.os.Looper;
+
 import com.luxrobo.modisdk.client.ModiFrameObserver;
 import com.luxrobo.modisdk.enums.PlayCommand;
 import com.luxrobo.modisdk.enums.PlayCommandData;
@@ -11,7 +12,6 @@ import com.luxrobo.modisdk.utils.ModiLog;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
 
 public class ModiPlayManager implements ModiFrameObserver {
 

@@ -198,9 +198,7 @@ class ModiManager : ModiFrameNotifier() {
 
                 }
 
-                if (it.size >= 16) {
-
-
+                if (it.size >= 10) {
 
 //                        mModiClient!!.onReceivedData(stringBuilder.toString())
                     mModiClient!!.onReceivedData(it)

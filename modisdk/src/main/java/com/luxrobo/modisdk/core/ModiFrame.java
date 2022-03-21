@@ -45,7 +45,7 @@ public class ModiFrame {
 
     public static byte[] makeFrame(int cmd, int sid, int did, byte[] data) {
 
-        byte[] frame = new byte[data.length + 6];
+        byte[] frame = new byte[data.length + 8];
 
         stuffFrameHeader(frame, cmd, sid, did);
         stuffFrameData(frame, data);

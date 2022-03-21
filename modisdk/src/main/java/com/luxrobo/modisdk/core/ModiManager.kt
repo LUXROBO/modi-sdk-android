@@ -198,7 +198,7 @@ class ModiManager : ModiFrameNotifier() {
 
                 }
 
-                if (it.size == 16 || it.size == 10) {
+                if (it.size >= 16) {
 
 
 
@@ -257,25 +257,6 @@ class ModiManager : ModiFrameNotifier() {
 
         Handler().postDelayed(
             {
-
-                val MODI = ByteArray(16)
-
-                for (i in 0..5) {
-                    MODI[i] = 0x00
-                }
-
-                MODI[6] = 0x08
-                MODI[7] = 0x00
-                MODI[8] = 0x02
-                MODI[9] = 0x00
-                MODI[10] = 0x00
-                MODI[11] = 0x00
-                MODI[12] = 0x00
-                MODI[13] = 0x00
-                MODI[14] = 0x00
-                MODI[15] = 0x00
-
-                sendData(MODI)
 
                 mModuleManager.setRootModule(getConnectedModiUuid())
                 sendData(ModiProtocol.getVersion(getConnectedModiUuid() and 0xFFF))

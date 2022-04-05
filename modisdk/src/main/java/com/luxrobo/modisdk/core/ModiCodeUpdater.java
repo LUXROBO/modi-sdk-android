@@ -259,6 +259,7 @@ public class ModiCodeUpdater implements ModiFrameObserver {
             ModiLog.i("---- Module(" + (m.type != null ? m.type : "") + ", " + Integer.toHexString(m.uuid) + ")");
         }
 
+        ModiLog.i("streamBody.length : " + stream.streamBody.length);
         total = modules.size() * MODULE_PROGRESS_COUNT_UNIT + stream.streamBody.length;
         progressNotifierStart(total);
 
@@ -380,7 +381,7 @@ public class ModiCodeUpdater implements ModiFrameObserver {
 
     public synchronized void waitForSendDone() throws Exception {
         // TODO: Timeout 시 핸들링 개선
-        wait(1000);
+        wait(100);
     }
 
     public synchronized void notifySendDone(int status) {

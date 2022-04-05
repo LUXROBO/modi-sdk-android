@@ -53,6 +53,16 @@ public class ModiFrame {
         return frame;
     }
 
+    public static byte[] makeFrame(int cmd, int sid, int did, byte[] data, int length) {
+
+        byte[] frame = new byte[data.length + 8];
+
+        stuffFrameHeader(frame, cmd, sid, did);
+        stuffFrameData(frame, data, length);
+
+        return frame;
+    }
+
     public static ArrayList<byte[]> makeFrames(int cmd, int sid, int did, @NonNull byte[] data) {
 
         ArrayList<byte[]> frame_array = new ArrayList<>();
@@ -86,6 +96,14 @@ public class ModiFrame {
     private static void stuffFrameData(@NonNull byte[] buffer, @NonNull byte[] data) {
         buffer[6] = (byte) (data.length & 0xFF);
         buffer[7] = (byte) ((data.length >> 8) & 0xFF);
+        for (int i = 0; i < data.length; i++) {
+            buffer[i + 8] = data[i];
+        }
+    }
+
+    private static void stuffFrameData(@NonNull byte[] buffer, @NonNull byte[] data, int length) {
+        buffer[6] = (byte) (length & 0xFF);
+        buffer[7] = (byte) ((length >> 8) & 0xFF);
         for (int i = 0; i < data.length; i++) {
             buffer[i + 8] = data[i];
         }

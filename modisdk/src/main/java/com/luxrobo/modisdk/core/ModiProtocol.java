@@ -76,19 +76,56 @@ public class ModiProtocol {
         for (int i = 0; i < stream.streamBody.length; i += 7) {
             int begin = i;
             int end = i + 7;
-            if (end > stream.streamBody.length)
+            boolean isEnd = false;
+
+            if (end > stream.streamBody.length) {
                 end = stream.streamBody.length;
-
-            byte[] slice = Arrays.copyOfRange(stream.streamBody, begin, end);
-
-            byte[] streamSlice = new byte[slice.length + 1];
-            streamSlice[0] = stream.streamId;
-
-            for (int j = 0; j < slice.length; j++) {
-                streamSlice[j + 1] = slice[j];
+                isEnd = true;
             }
 
-            dataList.add(ModiFrame.makeFrame(0x10, 0, stream.moduleId, streamSlice));
+            if (isEnd) {
+
+                ModiLog.d("steave isEnd1");
+
+                byte[] slice = Arrays.copyOfRange(stream.streamBody, begin, end);
+
+                byte[] streamSlice = new byte[8];
+                streamSlice[0] = stream.streamId;
+
+                ModiLog.d("steave isEnd1 slice.length " + slice.length);
+                ModiLog.d("steave isEnd1 end " + end);
+
+
+                for (int j = 0; j < 7; j++) {
+
+                    ModiLog.d("steave isEnd2 j " + j);
+
+                    if(i < slice.length) {
+                        streamSlice[j + 1] = slice[j];
+                    }
+
+                    else {
+                        streamSlice[j + 1] = 0;
+                    }
+                }
+                dataList.add(ModiFrame.makeFrame(0x10, 0, stream.moduleId, streamSlice, slice.length + 1));
+//                dataList.add(ModiFrame.makeFrame(0x10, 0, stream.moduleId, streamSlice, slice.length));
+
+            }
+
+            else {
+
+                byte[] slice = Arrays.copyOfRange(stream.streamBody, begin, end);
+
+                byte[] streamSlice = new byte[slice.length + 1];
+                streamSlice[0] = stream.streamId;
+
+                for (int j = 0; j < slice.length; j++) {
+                    streamSlice[j + 1] = slice[j];
+                }
+
+                dataList.add(ModiFrame.makeFrame(0x10, 0, stream.moduleId, streamSlice));
+            }
         }
 
         return dataList;

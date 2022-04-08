@@ -86,6 +86,41 @@ public class ModiPlayManager implements ModiFrameObserver {
 
     }
 
+    public void modiPlusEvent(int index, int property, PlayCommand command, PlayCommandData commandData, int options) throws Exception {
+
+        try {
+            if (!mModiManager.isConnected()) {
+                throw new Exception("Can't send Play Command (module is not connected.)");
+            }
+
+            int target = mModiManager.getConnectedModiUuid() & 0xFFF;
+
+            byte[] frameData = new byte[8];
+
+            switch (command.value) {
+                case 2 :
+                    frameData[2] = (byte) commandData.value;
+                    break;
+                case 4:
+                    frameData[4] = (byte) commandData.value;
+                    break;
+                default:
+                    frameData[0] = (byte) commandData.value;
+                    break;
+            }
+
+            frameData[7] = (byte) options;
+
+            int did = property + (index * 100);
+            // TODO: Command Refreshing handling
+            sendFrame(ModiFrame.makeFrame(0x1F, target, did, frameData));
+        }
+
+        catch (Exception e) {
+            ModiLog.e("fireEvent error : " + e.toString());
+        }
+    }
+
     private void sendFrame(byte[] data) {
         // TODO: Send Packet
         mModiManager.sendData(data);

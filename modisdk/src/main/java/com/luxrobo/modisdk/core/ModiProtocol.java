@@ -85,20 +85,12 @@ public class ModiProtocol {
 
             if (isEnd) {
 
-                ModiLog.d("steave isEnd1");
-
                 byte[] slice = Arrays.copyOfRange(stream.streamBody, begin, end);
 
                 byte[] streamSlice = new byte[8];
                 streamSlice[0] = stream.streamId;
 
-                ModiLog.d("steave isEnd1 slice.length " + slice.length);
-                ModiLog.d("steave isEnd1 end " + end);
-
-
                 for (int j = 0; j < 7; j++) {
-
-                    ModiLog.d("steave isEnd2 j " + j);
 
                     if(i < slice.length) {
                         streamSlice[j + 1] = slice[j];

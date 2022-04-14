@@ -86,7 +86,7 @@ public class ModiPlayManager implements ModiFrameObserver {
 
     }
 
-    public void modiPlusEvent(int index, int property, PlayCommand command, PlayCommandData commandData, int options) throws Exception {
+    public void modiPlusEvent(int index, int property, PlayCommand command, int commandData, int options) throws Exception {
 
         try {
             if (!mModiManager.isConnected()) {
@@ -99,13 +99,13 @@ public class ModiPlayManager implements ModiFrameObserver {
 
             switch (command.value) {
                 case 2 :
-                    frameData[2] = (byte) commandData.value;
+                    frameData[2] = (byte) commandData;
                     break;
                 case 4:
-                    frameData[4] = (byte) commandData.value;
+                    frameData[4] = (byte) commandData;
                     break;
                 default:
-                    frameData[0] = (byte) commandData.value;
+                    frameData[0] = (byte) commandData;
                     break;
             }
 

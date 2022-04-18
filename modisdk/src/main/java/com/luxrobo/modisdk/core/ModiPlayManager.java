@@ -86,7 +86,7 @@ public class ModiPlayManager implements ModiFrameObserver {
 
     }
 
-    public void modiPlusEvent(int index, int property, PlayCommand command, int commandData, int options) throws Exception {
+    public void modiPlusEvent(int index, int property, PlayCommand command, int commandData) throws Exception {
 
         try {
             if (!mModiManager.isConnected()) {
@@ -97,22 +97,31 @@ public class ModiPlayManager implements ModiFrameObserver {
 
             byte[] frameData = new byte[8];
 
-            switch (command.value) {
-                case 2 :
+            switch (command) {
+                case BUTTON_CLICK:
+                case IMU_ANGLE_PITCH :
                     frameData[2] = (byte) commandData;
                     break;
-                case 4:
+                case BUTTON_DOUBLE_CLICK:
+                case IMU_ANGLE_YAW:
                     frameData[4] = (byte) commandData;
                     break;
+                case RECEIVE_DATA:
+
+                    frameData[3] = (byte) (commandData >> 24 & 0xFF);
+                    frameData[2] = (byte) (commandData >> 16 & 0xFF);
+                    frameData[1] = (byte) (commandData >> 8 & 0xFF);
+                    frameData[0] = (byte) (commandData & 0xFF);
+
+                    break;
+
                 default:
                     frameData[0] = (byte) commandData;
                     break;
             }
 
-            frameData[7] = (byte) options;
-
             int did = property + (index * 100);
-            // TODO: Command Refreshing handling
+
             sendFrame(ModiFrame.makeFrame(0x1F, target, did, frameData));
         }
 

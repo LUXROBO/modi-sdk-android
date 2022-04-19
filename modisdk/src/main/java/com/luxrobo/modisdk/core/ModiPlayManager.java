@@ -94,31 +94,16 @@ public class ModiPlayManager implements ModiFrameObserver {
             }
 
             int target = mModiManager.getConnectedModiUuid() & 0xFFF;
+            byte[] frameData;
 
-            byte[] frameData = new byte[8];
-
-            switch (command) {
-                case BUTTON_CLICK:
-                case IMU_ANGLE_PITCH :
-                    frameData[2] = (byte) commandData;
-                    break;
-                case BUTTON_DOUBLE_CLICK:
-                case IMU_ANGLE_YAW:
-                    frameData[4] = (byte) commandData;
-                    break;
-                case RECEIVE_DATA:
-
-                    frameData[3] = (byte) (commandData >> 24 & 0xFF);
-                    frameData[2] = (byte) (commandData >> 16 & 0xFF);
-                    frameData[1] = (byte) (commandData >> 8 & 0xFF);
-                    frameData[0] = (byte) (commandData & 0xFF);
-
-                    break;
-
-                default:
-                    frameData[0] = (byte) commandData;
-                    break;
+            if (commandData < 0) {
+                frameData = signedGetEventData(command, commandData);
             }
+
+            else {
+                frameData = getEventData(command, commandData);
+            }
+
 
             int did = property + (index * 100);
 
@@ -128,6 +113,68 @@ public class ModiPlayManager implements ModiFrameObserver {
         catch (Exception e) {
             ModiLog.e("fireEvent error : " + e.toString());
         }
+    }
+
+    private byte[] signedGetEventData( PlayCommand command, int commandData) {
+
+        byte[] frameData = new byte[8];
+
+        switch (command) {
+            case BUTTON_CLICK:
+            case IMU_ANGLE_PITCH :
+                frameData[2] = (byte) commandData;
+                frameData[3] = (byte) (commandData >> 8 & 0xFF);
+                break;
+            case BUTTON_DOUBLE_CLICK:
+            case IMU_ANGLE_YAW:
+                frameData[4] = (byte) commandData;
+                frameData[5] = (byte) (commandData >> 8 & 0xFF);
+                break;
+            case RECEIVE_DATA:
+
+                frameData[3] = (byte) (commandData >> 24 & 0xFF);
+                frameData[2] = (byte) (commandData >> 16 & 0xFF);
+                frameData[1] = (byte) (commandData >> 8 & 0xFF);
+                frameData[0] = (byte) (commandData & 0xFF);
+
+                break;
+
+            default:
+                frameData[0] = (byte) commandData;
+                frameData[1] = (byte) (commandData >> 8 & 0xFF);
+                break;
+        }
+
+        return frameData;
+    }
+    private byte[] getEventData( PlayCommand command, int commandData) {
+
+        byte[] frameData = new byte[8];
+
+        switch (command) {
+            case BUTTON_CLICK:
+            case IMU_ANGLE_PITCH :
+                frameData[2] = (byte) commandData;
+                break;
+            case BUTTON_DOUBLE_CLICK:
+            case IMU_ANGLE_YAW:
+                frameData[4] = (byte) commandData;
+                break;
+            case RECEIVE_DATA:
+
+                frameData[3] = (byte) (commandData >> 24 & 0xFF);
+                frameData[2] = (byte) (commandData >> 16 & 0xFF);
+                frameData[1] = (byte) (commandData >> 8 & 0xFF);
+                frameData[0] = (byte) (commandData & 0xFF);
+
+                break;
+
+            default:
+                frameData[0] = (byte) commandData;
+                break;
+        }
+
+        return frameData;
     }
 
     private void sendFrame(byte[] data) {

@@ -83,17 +83,18 @@ public class ModiProtocol {
                 isEnd = true;
             }
 
-            if (isEnd) {
+            byte[] slice = Arrays.copyOfRange(stream.streamBody, begin, end);
 
-                byte[] slice = Arrays.copyOfRange(stream.streamBody, begin, end);
+            if (isEnd) {
 
                 byte[] streamSlice = new byte[8];
                 streamSlice[0] = stream.streamId;
 
                 for (int j = 0; j < 7; j++) {
 
-                    if(i < slice.length) {
+                    if(j < slice.length) {
                         streamSlice[j + 1] = slice[j];
+
                     }
 
                     else {
@@ -101,13 +102,10 @@ public class ModiProtocol {
                     }
                 }
                 dataList.add(ModiFrame.makeFrame(0x10, 0, stream.moduleId, streamSlice, slice.length + 1));
-//                dataList.add(ModiFrame.makeFrame(0x10, 0, stream.moduleId, streamSlice, slice.length));
-
+                
             }
 
             else {
-
-                byte[] slice = Arrays.copyOfRange(stream.streamBody, begin, end);
 
                 byte[] streamSlice = new byte[slice.length + 1];
                 streamSlice[0] = stream.streamId;

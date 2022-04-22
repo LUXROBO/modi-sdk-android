@@ -274,9 +274,6 @@ class ModiManager : ModiFrameNotifier() {
 
         bleDevice = rxBleClient.getBleDevice(macAddress)
 
-
-//        connectionObservable = prepareConnectionObservable()
-
         val mtuNegotiationObservableTransformer = ObservableTransformer<RxBleConnection, RxBleConnection> { upstream ->
             upstream.doOnSubscribe { ModiLog.i("MTU", "MTU negotiation is supported") }
                 .flatMapSingle { connection ->
@@ -287,7 +284,6 @@ class ModiManager : ModiFrameNotifier() {
                         .andThen(Single.just(connection))
                 }
         }
-
 
         bleDevice.observeConnectionStateChanges()
             .observeOn(AndroidSchedulers.mainThread())
@@ -318,8 +314,6 @@ class ModiManager : ModiFrameNotifier() {
                 mBluetoothGattServices = it.bluetoothGattServices
                 startNotification()
                 mModiClient!!.onDiscoveredService()
-
-//                sendData(ModiProtocol.setModuleState(0xFFF, ModiProtocol.MODULE_STATE.RESET))
 
             }, {
                 onConnectionFailure(it)

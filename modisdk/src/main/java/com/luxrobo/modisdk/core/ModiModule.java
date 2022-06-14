@@ -28,6 +28,7 @@ public class ModiModule {
     public int version;
     public int typeCode;
     public String type = "null";
+    public int index = 0;
     public int uuid;
     public int state;
     public Timestamp lastUpdate;
@@ -82,10 +83,10 @@ public class ModiModule {
 
     public String getString() {
 
-        String name = type.toLowerCase()+"0";
+        String name = type.toLowerCase()+index;
 
         if(typeCode == 0x4011) {
-            name = type.toLowerCase()+"1";
+            name = TYPE_MOTOR_B.toLowerCase()+index;
         }
 
         return String.format("this.%s = %s(0x%04X%08X);\n", name, type, typeCode, uuid);

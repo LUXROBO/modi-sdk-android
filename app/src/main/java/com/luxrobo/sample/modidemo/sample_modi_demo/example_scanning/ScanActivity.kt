@@ -3,16 +3,16 @@ package com.luxrobo.sample.modidemo.sample_modi_demo.example_scanning
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.luxrobo.modisdk.callback.ModiCodeUpdaterCallback
 import com.luxrobo.modisdk.client.ModiClient
-import com.luxrobo.modisdk.core.ModiManager
-import com.luxrobo.modisdk.core.ModiPlayManager
-import com.luxrobo.modisdk.core.ModiStream
+import com.luxrobo.modisdk.core.*
 import com.luxrobo.modisdk.enums.CodeUpdateError
 import com.luxrobo.modisdk.enums.PlayCommand
 import com.luxrobo.modisdk.enums.PlayCommandData
+import com.luxrobo.modisdk.listener.ModiModuleManagerListener
 import com.luxrobo.modisdk.utils.ModiLog
 import com.luxrobo.sample.modidemo.BaseActivity
 import com.luxrobo.sample.modidemo.R
@@ -104,6 +104,22 @@ class ScanActivity : BaseActivity() {
 
             mPlayManager.modiPlusEvent(0,3,PlayCommand.BUTTON_CLICK, PlayCommandData.PRESSED.value)
         }
+
+        mModeModuleManager.setListener(object : ModiModuleManagerListener {
+
+            override fun onConnectModule(manager: ModiModuleManager?, module: ModiModule?) {
+                Log.d("Steave", "onConnectModule  ${module?.type} index : ${module?.index}")
+            }
+
+            override fun onExpiredModule(manager: ModiModuleManager?, module: ModiModule?) {
+                Log.d("Steave", "onExpiredModule ${module?.type}  index : ${module?.index}")
+            }
+
+            override fun onUpdateModule(manager: ModiModuleManager?, module: ModiModule?) {
+
+            }
+
+        })
 
     }
 

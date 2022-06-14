@@ -7,8 +7,8 @@
 
 
 Easy😆 and fast💨 MODI SDK API.
-
-* Documentation: https://luxrobo.github.io/modi-sdk-android/index.html
+ 
+* Documentation:  https://luxrobo.github.io/modi-sdk-android/index.html
 
 
 Quickstart

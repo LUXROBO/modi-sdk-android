@@ -1,20 +1,20 @@
-me: Feature request
-about: 기능 추가 또는 개선 요청을 위한 템플릿
-title: "[Feat] "
-labels: 'Type: Feature'
+---
+name: Feature request
+about: Suggest an idea for this project
+title: ''
+labels: ''
 assignees: ''
 
 ---
 
-**간단 설명**
+**Is your feature request related to a problem? Please describe.**
 A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 
-**현재 상황**
+**Describe the solution you'd like**
 A clear and concise description of what you want to happen.
 
-**요구사항**
-A clear and concise description of any alternative solutions or features you've considered
+**Describe alternatives you've considered**
+A clear and concise description of any alternative solutions or features you've considered.
 
-**스크린샷**
+**Additional context**
 Add any other context or screenshots about the feature request here.
-

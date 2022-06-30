@@ -22,6 +22,7 @@ public class ModiProtocol {
 
     public enum MODULE_STATE {
         RUN(0),         // task resume, module task enable
+        FORCED_PAUSE(2),
         STOP(3),        // task suspend, module task disable
         UPDATE(4),
         UPDATE_READY(5),

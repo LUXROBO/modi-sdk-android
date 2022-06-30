@@ -131,7 +131,6 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
 
     private void removeMultiModule(ModiModule module) {
 
-        int i = 1;
         ArrayList<ModiModule> modules = new ArrayList<>();
 
         switch(module.typeCode) {
@@ -191,11 +190,6 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
                 speakerList.remove(module);
                 modules = speakerList;
                 break;
-        }
-
-        for (ModiModule item : modules) {
-            item.index = i;
-            i++;
         }
     }
 

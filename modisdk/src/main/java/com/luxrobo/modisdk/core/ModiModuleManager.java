@@ -10,7 +10,7 @@ import java.nio.ByteBuffer;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Objects;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -23,21 +23,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
     private ConcurrentHashMap<Integer, ModiModule> mModuleMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Integer, ModiModule> mDisabledModuleMap = new ConcurrentHashMap<>();
 
-    //MODI PLUS 다중 연결을 위한 리스트
-    private final ArrayList<ModiModule> networkList = new ArrayList<>();
-    private final ArrayList<ModiModule> batteryList = new ArrayList<>();
-    private final ArrayList<ModiModule> environmentList = new ArrayList<>();
-    private final ArrayList<ModiModule> imuList = new ArrayList<>();
-    private final ArrayList<ModiModule> micList = new ArrayList<>();
-    private final ArrayList<ModiModule> buttonList = new ArrayList<>();
-    private final ArrayList<ModiModule> dialList = new ArrayList<>();
-    private final ArrayList<ModiModule> joystickList = new ArrayList<>();
-    private final ArrayList<ModiModule> tofList = new ArrayList<>();
-    private final ArrayList<ModiModule> displayList = new ArrayList<>();
-    private final ArrayList<ModiModule> motorList = new ArrayList<>();
-    private final ArrayList<ModiModule> motorBList = new ArrayList<>();
-    private final ArrayList<ModiModule> ledList =new ArrayList<>();
-    private final ArrayList<ModiModule> speakerList = new ArrayList<>();
+    private final HashMap<Integer, ArrayList> multiModuleMap = new HashMap<>();
 
     private ModiModuleManagerListener mListener = null;
     private ModiManager mModiMananger;
@@ -47,6 +33,37 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
     ModiModuleManager(ModiManager manager) {
         mModiMananger = manager;
         mHandler = new Handler(Looper.getMainLooper());
+
+        //MODI PLUS 다중 연결을 위한 리스트
+        ArrayList<ModiModule> networkList = new ArrayList<>();
+        ArrayList<ModiModule> batteryList = new ArrayList<>();
+        ArrayList<ModiModule> environmentList = new ArrayList<>();
+        ArrayList<ModiModule> imuList = new ArrayList<>();
+        ArrayList<ModiModule> micList = new ArrayList<>();
+        ArrayList<ModiModule> buttonList = new ArrayList<>();
+        ArrayList<ModiModule> dialList = new ArrayList<>();
+        ArrayList<ModiModule> joystickList = new ArrayList<>();
+        ArrayList<ModiModule> tofList = new ArrayList<>();
+        ArrayList<ModiModule> displayList = new ArrayList<>();
+        ArrayList<ModiModule> motorList = new ArrayList<>();
+        ArrayList<ModiModule> motorBList = new ArrayList<>();
+        ArrayList<ModiModule> ledList =new ArrayList<>();
+        ArrayList<ModiModule> speakerList = new ArrayList<>();
+
+        multiModuleMap.put(0x0000, networkList);
+        multiModuleMap.put(0x0010, batteryList);
+        multiModuleMap.put(0x2000, environmentList);
+        multiModuleMap.put(0x2010, imuList);
+        multiModuleMap.put(0x2020, micList);
+        multiModuleMap.put(0x2030, buttonList);
+        multiModuleMap.put(0x2040, dialList);
+        multiModuleMap.put(0x2070, joystickList);
+        multiModuleMap.put(0x2080, tofList);
+        multiModuleMap.put(0x4000, displayList);
+        multiModuleMap.put(0x4010, motorList);
+        multiModuleMap.put(0x4011, motorBList);
+        multiModuleMap.put(0x4020, ledList);
+        multiModuleMap.put(0x4030, speakerList);
 
         ModiLog.i("ModiModuleManager init");
 
@@ -79,118 +96,35 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
 
     private int addMultiModule(ModiModule module) {
 
-        switch (module.typeCode) {
-            case 0x0000 :
-                networkList.add(module);
-                return networkList.indexOf(module) + 1;
+        ArrayList<Integer> emptyArray = new ArrayList<>();
+        ArrayList<ModiModule> moduleList = multiModuleMap.get(module.typeCode);
 
-            case 0x0010 :
-                batteryList.add(module);
-                return batteryList.indexOf(module) + 1;
+        for (int i = 0; i < moduleList.size() ; i++) {
 
-            case 0x2000 :
-                environmentList.add(module);
-                return environmentList.indexOf(module) + 1;
+        ArrayList<ModiModule> modules = new ArrayList<>();
 
-            case 0x2010 :
-                imuList.add(module);
-                return imuList.indexOf(module) + 1;
-            case 0x2020 :
-                micList.add(module);
-                return micList.indexOf(module) + 1;
-            case 0x2030 :
-                buttonList.add(module);
-                return buttonList.indexOf(module) + 1;
-            case 0x2040 :
-                dialList.add(module);
-                return dialList.indexOf(module) + 1;
-            case 0x2070 :
-                joystickList.add(module);
-                return joystickList.indexOf(module) + 1;
-            case 0x2080 :
-                tofList.add(module);
-                return tofList.indexOf(module) + 1;
-            case 0x4000 :
-                displayList.add(module);
-                return displayList.indexOf(module) + 1;
-            case 0x4010 :
-                motorList.add(module);
-                return motorList.indexOf(module) + 1;
-            case 0x4011 :
-                motorBList.add(module);
-                return motorBList.indexOf(module) + 1;
-            case 0x4020 :
-                ledList.add(module);
-                return ledList.indexOf(module) + 1;
-            case 0x4030 :
-                speakerList.add(module);
-                return speakerList.indexOf(module) + 1;
-            default: return 0;
+
+            if(moduleList.get(i).index != i + 1) {
+                emptyArray.add(i);
+            }
         }
+
+        if(emptyArray.isEmpty()) {
+            moduleList.add(module);
+        }
+
+        else {
+            moduleList.add(emptyArray.get(0),module);
+        }
+
+        return moduleList.indexOf(module) + 1;
     }
 
     private void removeMultiModule(ModiModule module) {
 
-        ArrayList<ModiModule> modules = new ArrayList<>();
+        ArrayList<ModiModule> moduleList = multiModuleMap.get(module.typeCode);
+        moduleList.remove(module);
 
-        switch(module.typeCode) {
-            case 0x0000 :
-                networkList.remove(module);
-                modules = networkList;
-                break;
-            case 0x0010 :
-                batteryList.remove(module);
-                modules = batteryList;
-                break;
-            case 0x2000 :
-                environmentList.remove(module);
-                modules = environmentList;
-                break;
-            case 0x2010 :
-                imuList.remove(module);
-                modules = imuList;
-                break;
-            case 0x2020 :
-                micList.remove(module);
-                modules = micList;
-                break;
-            case 0x2030 :
-                buttonList.remove(module);
-                modules = buttonList;
-                break;
-            case 0x2040 :
-                dialList.remove(module);
-                modules = dialList;
-                break;
-            case 0x2070 :
-                joystickList.remove(module);
-                modules = joystickList;
-                break;
-            case 0x2080 :
-                tofList.remove(module);
-                modules = tofList;
-                break;
-            case 0x4000 :
-                displayList.remove(module);
-                modules = displayList;
-                break;
-            case 0x4010 :
-                motorList.remove(module);
-                modules = motorList;
-                break;
-            case 0x4011 :
-                motorBList.remove(module);
-                modules = motorBList;
-                break;
-            case 0x4020 :
-                ledList.remove(module);
-                modules = ledList;
-                break;
-            case 0x4030 :
-                speakerList.remove(module);
-                modules = speakerList;
-                break;
-        }
     }
 
     public void setRootModule(int uuid) {
@@ -290,7 +224,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
 
             ModiModule module = ModiModule.makeModule(typeCode, uuid, version, state, time);
             mModuleMap.put(moduleKey, module);
-            module.index =  addMultiModule(module);
+            module.index = addMultiModule(module);
             ModiLog.i(module.getString() + " Connected. os-version = " + version);
 
             removeDisableMapModule(moduleKey);
@@ -394,22 +328,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
         }
 
         mModuleMap.clear();
-        networkList.clear();
-        batteryList.clear();
-        environmentList.clear();
-        networkList.clear();
-        imuList.clear();
-        networkList.clear();
-        micList.clear();
-        buttonList.clear();
-        dialList.clear();
-        joystickList.clear();
-        tofList.clear();
-        displayList.clear();
-        motorList.clear();
-        motorBList.clear();
-        ledList.clear();
-        speakerList.clear();
+        multiModuleMap.clear();
     }
 
     private boolean isRootModule(int moduleKey) {

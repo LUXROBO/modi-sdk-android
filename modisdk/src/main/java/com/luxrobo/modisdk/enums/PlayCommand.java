@@ -2,6 +2,7 @@ package com.luxrobo.modisdk.enums;
 
 public enum PlayCommand {
     RECEIVE_DATA(0x00),
+    SEND_DATA(0x02),
     BUTTON_PRESS_STATUS(0x00),
     BUTTON_CLICK(0x02),
     BUTTON_DOUBLE_CLICK(0x04),

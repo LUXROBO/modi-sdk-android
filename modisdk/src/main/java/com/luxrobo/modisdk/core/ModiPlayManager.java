@@ -131,6 +131,7 @@ public class ModiPlayManager implements ModiFrameObserver {
                 frameData[5] = (byte) (commandData >> 8 & 0xFF);
                 break;
             case RECEIVE_DATA:
+            case SEND_DATA:
 
                 frameData[3] = (byte) (commandData >> 24 & 0xFF);
                 frameData[2] = (byte) (commandData >> 16 & 0xFF);
@@ -161,7 +162,7 @@ public class ModiPlayManager implements ModiFrameObserver {
                 frameData[4] = (byte) commandData;
                 break;
             case RECEIVE_DATA:
-
+            case SEND_DATA:
                 frameData[3] = (byte) (commandData >> 24 & 0xFF);
                 frameData[2] = (byte) (commandData >> 16 & 0xFF);
                 frameData[1] = (byte) (commandData >> 8 & 0xFF);

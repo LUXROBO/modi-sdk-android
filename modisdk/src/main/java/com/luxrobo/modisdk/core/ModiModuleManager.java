@@ -11,6 +11,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -23,7 +25,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
     private ConcurrentHashMap<Integer, ModiModule> mModuleMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Integer, ModiModule> mDisabledModuleMap = new ConcurrentHashMap<>();
 
-    private final HashMap<Integer, ArrayList> multiModuleMap = new HashMap<>();
+    private HashMap<Integer, ArrayList<ModiModule>> multiModuleMap = new HashMap<>();
 
     private ModiModuleManagerListener mListener = null;
     private ModiManager mModiMananger;
@@ -31,10 +33,12 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
     private Handler mHandler;
 
     ModiModuleManager(ModiManager manager) {
+
+        ModiLog.i("ModiModuleManager init");
+
         mModiMananger = manager;
         mHandler = new Handler(Looper.getMainLooper());
 
-        //MODI PLUS 다중 연결을 위한 리스트
         ArrayList<ModiModule> networkList = new ArrayList<>();
         ArrayList<ModiModule> batteryList = new ArrayList<>();
         ArrayList<ModiModule> environmentList = new ArrayList<>();
@@ -64,9 +68,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
         multiModuleMap.put(0x4011, motorBList);
         multiModuleMap.put(0x4020, ledList);
         multiModuleMap.put(0x4030, speakerList);
-
-        ModiLog.i("ModiModuleManager init");
-
+        //MODI PLUS 다중 연결을 위한 리스트
     }
 
 
@@ -77,7 +79,6 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
     public boolean discoverModules() {
 
         ModiLog.i("ModiModuleManager discoverModules");
-
         mModiMananger.sendData(ModiProtocol.discoverModule(0xFFF, (byte) 0x0));
         return true;
     }
@@ -101,9 +102,6 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
 
         for (int i = 0; i < moduleList.size() ; i++) {
 
-        ArrayList<ModiModule> modules = new ArrayList<>();
-
-
             if(moduleList.get(i).index != i + 1) {
                 emptyArray.add(i);
             }
@@ -123,6 +121,9 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
     private void removeMultiModule(ModiModule module) {
 
         ArrayList<ModiModule> moduleList = multiModuleMap.get(module.typeCode);
+
+        if(Objects.requireNonNull(moduleList).isEmpty()) return;
+
         moduleList.remove(module);
 
     }
@@ -328,7 +329,10 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
         }
 
         mModuleMap.clear();
-        multiModuleMap.clear();
+
+        for (Map.Entry<Integer, ArrayList<ModiModule>> entry : multiModuleMap.entrySet()) {
+            Objects.requireNonNull(multiModuleMap.get(entry.getKey())).clear();
+        }
     }
 
     private boolean isRootModule(int moduleKey) {

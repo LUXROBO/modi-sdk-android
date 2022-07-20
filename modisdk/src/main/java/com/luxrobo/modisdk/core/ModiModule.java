@@ -1,5 +1,7 @@
 package com.luxrobo.modisdk.core;
 
+import com.luxrobo.modisdk.utils.TextUtilsKt;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -81,6 +83,10 @@ public class ModiModule {
         module.state = state;
         module.lastUpdate = lastUpdate;
         return module;
+    }
+
+    public String getSubVersion() {
+        return TextUtilsKt.addSeparator(String.valueOf(subVersion));
     }
 
     public String getString() {

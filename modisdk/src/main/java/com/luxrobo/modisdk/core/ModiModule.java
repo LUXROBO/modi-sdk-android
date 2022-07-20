@@ -25,6 +25,7 @@ public class ModiModule {
     public static final String TYPE_TOF= "Tof";
     public static final String TYPE_IMU= "IMU";
 
+    public int subVersion;
     public int version;
     public int typeCode;
     public String type = "null";
@@ -33,11 +34,12 @@ public class ModiModule {
     public int state;
     public Timestamp lastUpdate;
 
-    public static ModiModule makeModule(int type, int uuid, int version, int state, Timestamp time) {
+    public static ModiModule makeModule(int type, int uuid, int version, int subVersion, int state, Timestamp time) {
         ModiModule module = new ModiModule();
         module.typeCode = type;
         module.type = ModiModule.typeCodeToString(type);
         module.uuid = uuid;
+        module.subVersion = subVersion;
         module.version = version;
         module.state = state;
         module.lastUpdate = time;
@@ -75,7 +77,7 @@ public class ModiModule {
         module.uuid = uuid;
         module.type = type;
         module.typeCode = typeCode;
-        module.version = version;
+        module.subVersion = subVersion;
         module.state = state;
         module.lastUpdate = lastUpdate;
         return module;

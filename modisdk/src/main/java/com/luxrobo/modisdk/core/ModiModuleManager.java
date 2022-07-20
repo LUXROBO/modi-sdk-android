@@ -2,8 +2,10 @@ package com.luxrobo.modisdk.core;
 
 import android.os.Handler;
 import android.os.Looper;
-import com.luxrobo.modisdk.listener.ModiModuleManagerListener;
+import android.util.Log;
+
 import com.luxrobo.modisdk.client.ModiFrameObserver;
+import com.luxrobo.modisdk.listener.ModiModuleManagerListener;
 import com.luxrobo.modisdk.utils.ModiLog;
 
 import java.nio.ByteBuffer;
@@ -21,7 +23,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
     private static final byte MODULE_STATE_UNKNOWN = (byte) 0xFF;
     private static final int MODULE_TIMEOUT_PERIOD = 5000;
     private static final int MODULE_CHECK_PERIOD = 5000;
-
+    private int modiDataFrameSize = 16;
     private ConcurrentHashMap<Integer, ModiModule> mModuleMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Integer, ModiModule> mDisabledModuleMap = new ConcurrentHashMap<>();
 
@@ -138,7 +140,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
             resetAllModules();
         }
 
-        ModiModule rootModule = ModiModule.makeModule(0x0000, uuid, 0, 0, new Timestamp(System.currentTimeMillis()));
+        ModiModule rootModule = ModiModule.makeModule(0x0000, uuid, 0, 0, 0, new Timestamp(System.currentTimeMillis()));
         ModiLog.i("set Root Module " + rootModule.toString());
 
         mRootmodule = rootModule;
@@ -175,14 +177,14 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
         if (mModuleMap.containsKey(key)) {
             ModiModule m = mModuleMap.get(key);
 
-            ModiLog.d(m.toString() + "version : " + m.version);
+            ModiLog.d(m.toString() + "version : " + m.subVersion);
 
-            return m.version;
+            return m.subVersion;
         } else if (mDisabledModuleMap.containsKey(key)) {
             ModiModule m = mDisabledModuleMap.get(key);
 
-            ModiLog.d(m.toString() + "last version : " + m.version);
-            return m.version;
+            ModiLog.d(m.toString() + "last version : " + m.subVersion);
+            return m.subVersion;
         }
 
         ModiLog.d(uuid + " can't find version");
@@ -213,20 +215,29 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
 
     private void updateModule(int moduleKey, byte[] moduleData) {
         if (!mModuleMap.containsKey(moduleKey)) {
+
+            for (int i = 0; i < moduleData.length; i++) {
+                Log.v("Greg", "ModiModuleManager -> updateModule -> moduleData : " + moduleData[i]);
+            }
+
             int uuid = ByteBuffer.wrap(Arrays.copyOfRange(moduleData, 0, 4)).order(java.nio.ByteOrder.LITTLE_ENDIAN).getInt();
             int typeCode = ByteBuffer.wrap(Arrays.copyOfRange(moduleData, 4, 6)).order(java.nio.ByteOrder.LITTLE_ENDIAN).getShort();
-            int version = ByteBuffer.wrap(Arrays.copyOfRange(moduleData, 6, 8)).order(java.nio.ByteOrder.LITTLE_ENDIAN).getShort();
+            int decimalVersionData = ByteBuffer.wrap(Arrays.copyOfRange(moduleData, 6, 8)).order(java.nio.ByteOrder.LITTLE_ENDIAN).getShort();
+
             int state = getModuleState(moduleKey);
             Timestamp time = new Timestamp(System.currentTimeMillis());
 
-            if (version == 10 || version == 0) {
-                version = 16690;
+            if (decimalVersionData == 10 || decimalVersionData == 0) {
+                decimalVersionData = 16690;
             }
 
-            ModiModule module = ModiModule.makeModule(typeCode, uuid, version, state, time);
+            String binaryVersionData = Integer.toString(decimalVersionData, 2);
+
+
+            ModiModule module = ModiModule.makeModule(typeCode, uuid, decimalVersionData, getSubVersion(binaryVersionData), state, time);
             mModuleMap.put(moduleKey, module);
             module.index = addMultiModule(module);
-            ModiLog.i(module.getString() + " Connected. os-version = " + version);
+            ModiLog.i(module.getString() + " Connected. os-version = " + decimalVersionData);
 
             removeDisableMapModule(moduleKey);
 
@@ -236,6 +247,32 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
         } else {
             updateModuleTime(moduleKey);
         }
+    }
+
+    private int getSubVersion(String data) {
+        return convertBinaryToDecimal(getBinaryOfSubVersion(data));
+    }
+
+    private StringBuffer getBinaryOfSubVersion(String binaryString) {
+        StringBuffer stringBuffer = new StringBuffer(modiDataFrameSize);
+
+        for (int i = 0; i < modiDataFrameSize - binaryString.length(); i++) {
+            stringBuffer.append("0");
+        }
+
+        for (int i = 0; i < binaryString.length(); i++) {
+            stringBuffer.append(binaryString.charAt(i));
+        }
+
+        return stringBuffer;
+    }
+
+    private int convertBinaryToDecimal(StringBuffer frameOfSubVersion) {
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append(Integer.parseInt(frameOfSubVersion.toString().substring(0, 3), 2));
+        stringBuffer.append(Integer.parseInt(frameOfSubVersion.toString().substring(3, 8), 2));
+        stringBuffer.append(Integer.parseInt(frameOfSubVersion.toString().substring(8, 16), 2));
+        return Integer.parseInt(stringBuffer.toString());
     }
 
     private void updateModule(int moduleKey, ModiModule module) {
@@ -258,9 +295,11 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
             int state = moduleData[6];
             Timestamp time = new Timestamp(System.currentTimeMillis());
 
-            ModiModule module = ModiModule.makeModule(typeCode, uuid, version, state, time);
+            Log.v("Greg", "ModiModuleManager -> updateModuleState -> version : " + version);
+
+            ModiModule module = ModiModule.makeModule(typeCode, uuid, version, version, state, time);
             mModuleMap.put(id, module);
-            module.index =  addMultiModule(module);
+            module.index = addMultiModule(module);
 
             ModiLog.i(module.getString() + " Connected. os-version-cached = " + version);
 

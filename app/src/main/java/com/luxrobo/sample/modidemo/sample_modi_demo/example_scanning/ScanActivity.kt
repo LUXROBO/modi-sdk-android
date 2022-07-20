@@ -1,7 +1,5 @@
 package com.luxrobo.sample.modidemo.sample_modi_demo.example_scanning
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.databinding.DataBindingUtil
@@ -17,7 +15,6 @@ import com.luxrobo.modisdk.utils.ModiLog
 import com.luxrobo.sample.modidemo.BaseActivity
 import com.luxrobo.sample.modidemo.R
 import com.luxrobo.sample.modidemo.databinding.ActivityScanBinding
-import com.luxrobo.sample.modidemo.sample_modi_demo.example_connect.ConnectActivity
 import com.polidea.rxandroidble2.scan.ScanResult
 
 class ScanActivity : BaseActivity() {
@@ -108,11 +105,17 @@ class ScanActivity : BaseActivity() {
         mModeModuleManager.setListener(object : ModiModuleManagerListener {
 
             override fun onConnectModule(manager: ModiModuleManager?, module: ModiModule?) {
-                Log.d("Steave", "onConnectModule  ${module?.type} index : ${module?.index}")
+                Log.d(
+                    "Steave",
+                    "connectionTest onConnectModule moduleTyle : ${module?.type} , moduleVersion : ${module?.subVersion} , index : ${module?.index}"
+                )
             }
 
             override fun onExpiredModule(manager: ModiModuleManager?, module: ModiModule?) {
-                Log.d("Steave", "onExpiredModule ${module?.type}  index : ${module?.index}")
+                Log.d(
+                    "Steave",
+                    "connectionTest onExpiredModule moduleTyle : ${module?.type} , moduleVersion : ${module?.subVersion} , index : ${module?.index}"
+                )
             }
 
             override fun onUpdateModule(manager: ModiModuleManager?, module: ModiModule?) {
@@ -197,11 +200,24 @@ class ScanActivity : BaseActivity() {
             }
 
             override fun onReceivedData(data: String?) {
-
             }
 
             override fun onReceivedData(data: ByteArray?) {
+                data?.let {
 
+                    val frame = ModiFrame(it)
+
+                    if (isMainFirmwareVersionProperty(cmd = frame.cmd(), frame.sid())) {
+                        val connectedModiVersion = getESPVersion(
+                            frame = String(
+                                frame.data(),
+                                Charsets.US_ASCII
+                            )
+                        )
+
+                        Log.v("Greg","connectionTest espVersion : $connectedModiVersion")
+                    }
+                }
             }
 
             override fun onOffEvent() {
@@ -213,6 +229,53 @@ class ScanActivity : BaseActivity() {
             }
 
         }
+    }
+
+    private fun isMainFirmwareVersionProperty(cmd: Int, sid: Int): Boolean {
+        return (cmd == 161 && sid == 9)
+    }
+
+    private fun getESPVersion(frame: String): Int {
+
+        Log.v("Greg", "BluetoothManager -> getESPVersion -> frame : $frame")
+
+        var espVersion = 0
+
+        if (frame.length == 8) {
+
+
+            espVersion = Integer.parseInt(
+                String.format(
+                    "%s%s%s",
+                    frame[frame.length - 5],
+                    frame[frame.length - 3],
+                    frame[frame.length - 1]
+                )
+            )
+        } else if (frame.length == 5) {
+
+            espVersion = Integer.parseInt(
+                String.format(
+                    "%s%s%s",
+                    frame[0],
+                    frame[2],
+                    frame[4]
+                )
+            )
+        } else {
+            espVersion = Integer.parseInt(
+                String.format(
+                    "%s%s%s",
+                    frame[frame.length - 4],
+                    frame[frame.length - 2],
+                    frame[frame.length]
+                )
+            )
+        }
+
+        Log.v("Greg", "BluetoothManager -> getESPVersion -> espVersion : $espVersion")
+
+        return espVersion
     }
 
     private fun setAdapter() {

@@ -1,5 +1,8 @@
 package com.luxrobo.modisdk.core;
 
+import android.util.Log;
+
+import com.google.gson.Gson;
 import com.luxrobo.modisdk.utils.TextUtilsKt;
 
 import org.json.JSONException;
@@ -45,7 +48,6 @@ public class ModiModule {
         module.version = version;
         module.state = state;
         module.lastUpdate = time;
-
         return module;
     }
 
@@ -101,21 +103,23 @@ public class ModiModule {
 //        return String.format("%s (%04X%8X)", type, typeCode, uuid);
     }
 
-    public JSONObject getData() {
+    public String getJsonData() {
 
-        String name = type.toLowerCase() + "0";
-        String data = String.format("%s(0x%04X%08X)", name, typeCode, uuid);
+        String haxUUID = String.format("0x%04X%08X", typeCode, uuid);
 
         JSONObject result = new JSONObject();
 
         try {
-
-            result.put(type, data);
-
+            result.put("index", index);
+            result.put("module", type);
+            result.put("uuid", haxUUID);
         } catch (JSONException e) {
 
         }
 
-        return result;
+        Log.v("Greg","ModiModule jsonObject : "+result);
+
+        return result.toString();
     }
 }
+

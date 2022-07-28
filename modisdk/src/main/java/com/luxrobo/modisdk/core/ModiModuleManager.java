@@ -8,7 +8,10 @@ import com.luxrobo.modisdk.client.ModiFrameObserver;
 import com.luxrobo.modisdk.listener.ModiModuleManagerListener;
 import com.luxrobo.modisdk.utils.ModiLog;
 
+import org.json.JSONObject;
+
 import java.nio.ByteBuffer;
+import java.sql.Array;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,8 +29,8 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
     private int modiDataFrameSize = 16;
     private ConcurrentHashMap<Integer, ModiModule> mModuleMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Integer, ModiModule> mDisabledModuleMap = new ConcurrentHashMap<>();
-
     private HashMap<Integer, ArrayList<ModiModule>> multiModuleMap = new HashMap<>();
+    private ArrayList<String> jsonListForInterpreter = new ArrayList<String>();
 
     private ModiModuleManagerListener mListener = null;
     private ModiManager mModiMananger;
@@ -128,6 +131,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
 
         moduleList.remove(module);
 
+        jsonListForInterpreter.remove(module.getJsonData());
     }
 
     public void setRootModule(int uuid) {
@@ -237,6 +241,8 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
             ModiModule module = ModiModule.makeModule(typeCode, uuid, decimalVersionData, getSubVersion(binaryVersionData), state, time);
             mModuleMap.put(moduleKey, module);
             module.index = addMultiModule(module);
+            jsonListForInterpreter.add(module.getJsonData());
+
             ModiLog.i(module.getString() + " Connected. os-version = " + decimalVersionData);
 
             removeDisableMapModule(moduleKey);
@@ -280,6 +286,8 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
             mModuleMap.put(moduleKey, module);
             ModiLog.i(module.getString() + " Connected");
             module.index = addMultiModule(module);
+            jsonListForInterpreter.add(module.getJsonData());
+
             if (mListener != null) {
                 mListener.onConnectModule(this, module);
             }
@@ -300,6 +308,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
             ModiModule module = ModiModule.makeModule(typeCode, uuid, version, version, state, time);
             mModuleMap.put(id, module);
             module.index = addMultiModule(module);
+            jsonListForInterpreter.add(module.getJsonData());
 
             ModiLog.i(module.getString() + " Connected. os-version-cached = " + version);
 
@@ -384,6 +393,10 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
             return true;
 
         return false;
+    }
+
+    public ArrayList<String> getJsonListForInterpreter() {
+        return jsonListForInterpreter;
     }
 
     @Override

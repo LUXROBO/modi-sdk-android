@@ -107,14 +107,26 @@ class ScanActivity : BaseActivity() {
             override fun onConnectModule(manager: ModiModuleManager?, module: ModiModule?) {
                 Log.d(
                     "Steave",
-                    "connectionTest onConnectModule moduleTyle : ${module?.type} , moduleVersion : ${module?.subVersion} , index : ${module?.index}"
+                    "connectionTest onConnectModule moduleTyle : ${module?.type} , moduleVersion : ${module?.subVersion} , index : ${module?.index} , uuid : ${
+                        String.format(
+                            "0x%04X%08X",
+                            module?.typeCode,
+                            module?.uuid
+                        )} , getData() : ${manager?.jsonListForInterpreter}"
                 )
+
+
             }
 
             override fun onExpiredModule(manager: ModiModuleManager?, module: ModiModule?) {
                 Log.d(
                     "Steave",
-                    "connectionTest onExpiredModule moduleTyle : ${module?.type} , moduleVersion : ${module?.subVersion} , index : ${module?.index}"
+                    "connectionTest onExpiredModule moduleTyle : ${module?.type} , moduleVersion : ${module?.subVersion} , index : ${module?.index} , uuid : ${
+                        String.format(
+                            "0x%04X%08X",
+                            module?.typeCode,
+                            module?.uuid
+                        )} , getData() : ${manager?.jsonListForInterpreter}"
                 )
             }
 

@@ -4,14 +4,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.google.gson.Gson;
 import com.luxrobo.modisdk.client.ModiFrameObserver;
 import com.luxrobo.modisdk.listener.ModiModuleManagerListener;
 import com.luxrobo.modisdk.utils.ModiLog;
 
-import org.json.JSONObject;
-
 import java.nio.ByteBuffer;
-import java.sql.Array;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -120,7 +118,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
             moduleList.add(emptyArray.get(0),module);
         }
 
-        return moduleList.indexOf(module) + 1;
+        return moduleList.indexOf(module);
     }
 
     private void removeMultiModule(ModiModule module) {

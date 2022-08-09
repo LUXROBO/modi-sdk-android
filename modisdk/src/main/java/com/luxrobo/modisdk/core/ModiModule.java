@@ -110,8 +110,8 @@ public class ModiModule {
         JSONObject result = new JSONObject();
 
         try {
-            result.put("index", index);
-            result.put("module", type);
+            result.put("index", String.valueOf(index));
+            result.put("module", type.toLowerCase());
             result.put("uuid", haxUUID);
         } catch (JSONException e) {
 

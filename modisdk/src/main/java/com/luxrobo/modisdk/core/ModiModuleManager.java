@@ -118,7 +118,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
             moduleList.add(emptyArray.get(0),module);
         }
 
-        return moduleList.indexOf(module);
+        return moduleList.indexOf(module)+1;
     }
 
     private void removeMultiModule(ModiModule module) {

@@ -103,9 +103,9 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
         ArrayList<Integer> emptyArray = new ArrayList<>();
         ArrayList<ModiModule> moduleList = multiModuleMap.get(module.typeCode);
 
-        for (int i = 0; i < moduleList.size() ; i++) {
+        for (int i = 0; i < moduleList.size(); i++) {
 
-            if(moduleList.get(i).index != i + 1) {
+            if(moduleList.get(i).index != i) {
                 emptyArray.add(i);
             }
         }
@@ -118,7 +118,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
             moduleList.add(emptyArray.get(0),module);
         }
 
-        return moduleList.indexOf(module)+1;
+        return moduleList.indexOf(module);
     }
 
     private void removeMultiModule(ModiModule module) {

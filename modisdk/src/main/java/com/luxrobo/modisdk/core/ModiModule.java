@@ -22,7 +22,7 @@ public class ModiModule {
     public static final String TYPE_IR = "Ir";
     public static final String TYPE_DISPLAY = "Display";
     public static final String TYPE_MOTOR = "Motor";
-    public static final String TYPE_MOTOR_B = "Motor";
+    public static final String TYPE_MOTOR_B = "MotorB";
     public static final String TYPE_LED = "Led";
     public static final String TYPE_SPEAKER = "Speaker";
     public static final String TYPE_BATTERY = "Battery";
@@ -97,6 +97,7 @@ public class ModiModule {
 
         if(typeCode == 0x4011) {
             name = TYPE_MOTOR_B.toLowerCase()+index;
+            return String.format("this.%s = %s(0x%04X%08X);\n", name, TYPE_MOTOR, typeCode, uuid);
         }
 
         return String.format("this.%s = %s(0x%04X%08X);\n", name, type, typeCode, uuid);

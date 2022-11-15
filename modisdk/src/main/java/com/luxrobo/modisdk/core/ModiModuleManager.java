@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.luxrobo.modisdk.client.ModiFrameObserver;
+import com.luxrobo.modisdk.enums.ModiType;
 import com.luxrobo.modisdk.listener.ModiModuleManagerListener;
 import com.luxrobo.modisdk.utils.ModiLog;
 
@@ -27,7 +28,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
     private int modiDataFrameSize = 16;
     private ConcurrentHashMap<Integer, ModiModule> mModuleMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Integer, ModiModule> mDisabledModuleMap = new ConcurrentHashMap<>();
-    private HashMap<Integer, ArrayList<ModiModule>> multiModuleMap = new HashMap<>();
+    private HashMap<String, ArrayList<ModiModule>> multiModuleMap = new HashMap<>();
     private ArrayList<String> jsonListForInterpreter = new ArrayList<String>();
 
     private ModiModuleManagerListener mListener = null;
@@ -53,24 +54,26 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
         ArrayList<ModiModule> tofList = new ArrayList<>();
         ArrayList<ModiModule> displayList = new ArrayList<>();
         ArrayList<ModiModule> motorList = new ArrayList<>();
+        ArrayList<ModiModule> motorAList = new ArrayList<>();
         ArrayList<ModiModule> motorBList = new ArrayList<>();
         ArrayList<ModiModule> ledList =new ArrayList<>();
         ArrayList<ModiModule> speakerList = new ArrayList<>();
 
-        multiModuleMap.put(0x0000, networkList);
-        multiModuleMap.put(0x0010, batteryList);
-        multiModuleMap.put(0x2000, environmentList);
-        multiModuleMap.put(0x2010, imuList);
-        multiModuleMap.put(0x2020, micList);
-        multiModuleMap.put(0x2030, buttonList);
-        multiModuleMap.put(0x2040, dialList);
-        multiModuleMap.put(0x2070, joystickList);
-        multiModuleMap.put(0x2080, tofList);
-        multiModuleMap.put(0x4000, displayList);
-        multiModuleMap.put(0x4010, motorList);
-        multiModuleMap.put(0x4011, motorBList);
-        multiModuleMap.put(0x4020, ledList);
-        multiModuleMap.put(0x4030, speakerList);
+        multiModuleMap.put(ModiType.TYPE_NETWORK.getType(), networkList);
+        multiModuleMap.put(ModiType.TYPE_BATTERY.getType(), batteryList);
+        multiModuleMap.put(ModiType.TYPE_ENVIRONMENT.getType(), environmentList);
+        multiModuleMap.put(ModiType.TYPE_IMU.getType(), imuList);
+        multiModuleMap.put(ModiType.TYPE_MIC.getType(), micList);
+        multiModuleMap.put(ModiType.TYPE_BUTTON.getType(), buttonList);
+        multiModuleMap.put(ModiType.TYPE_DIAL.getType(), dialList);
+        multiModuleMap.put(ModiType.TYPE_JOYSTICK.getType(), joystickList);
+        multiModuleMap.put(ModiType.TYPE_TOF.getType(), tofList);
+        multiModuleMap.put(ModiType.TYPE_DISPLAY.getType(), displayList);
+        multiModuleMap.put(ModiType.TYPE_MOTOR.getType(), motorList);
+        multiModuleMap.put("MotorA", motorAList);
+        multiModuleMap.put("MotorB", motorBList);
+        multiModuleMap.put(ModiType.TYPE_LED.getType(), ledList);
+        multiModuleMap.put(ModiType.TYPE_SPEAKER.getType(), speakerList);
         //MODI PLUS 다중 연결을 위한 리스트
     }
 
@@ -98,10 +101,11 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
         return modules;
     }
 
+
     private int addMultiModule(ModiModule module) {
 
         ArrayList<Integer> emptyArray = new ArrayList<>();
-        ArrayList<ModiModule> moduleList = multiModuleMap.get(module.typeCode);
+        ArrayList<ModiModule> moduleList = multiModuleMap.get(module.type);
 
         for (int i = 0; i < moduleList.size(); i++) {
 
@@ -121,13 +125,65 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
         return moduleList.indexOf(module);
     }
 
+    private int addMultiModuleForMotor(ModiModule module) {
+
+        String type = "";
+
+        if(module.typeCode == 0x4010) {
+            type = "MotorA";
+            Log.v("Greg", "addMultiModuleForMotor -> MotorA");
+        }
+
+        else if (module.typeCode == 0x4011) {
+            type = "MotorB";
+            Log.v("Greg", "addMultiModuleForMotor -> MotorB");
+        }
+
+        ArrayList<Integer> emptyArray = new ArrayList<>();
+        ArrayList<ModiModule> moduleList = multiModuleMap.get(type);
+
+        for (int i = 0; i < moduleList.size(); i++) {
+
+            if(moduleList.get(i).motoridx != i) {
+                ModiLog.i("addMultiModuleForMotor moduleList.get(i).index " + moduleList.get(i).index  + " i = " + i);
+                emptyArray.add(i);
+            }
+        }
+        ModiLog.i("addMultiModuleForMotor moduleList size " + moduleList.size() + " type = " + type);
+        ModiLog.i("addMultiModuleForMotor emptyArray size " + emptyArray.size());
+
+        if(emptyArray.isEmpty()) {
+            moduleList.add(module);
+            ModiLog.i("addMultiModuleForMotor moduleList.add(module);");
+        }
+
+        else {
+            moduleList.add(emptyArray.get(0),module);
+            ModiLog.i("addMultiModuleForMotor emptyArray.get(0) : "  + emptyArray.get(0));
+        }
+
+        ModiLog.i(module.getString() + " addMultiModuleForMotor size " + moduleList.size() + " index : " + moduleList.indexOf(module));
+
+        return moduleList.indexOf(module);
+    }
+
     private void removeMultiModule(ModiModule module) {
 
-        ArrayList<ModiModule> moduleList = multiModuleMap.get(module.typeCode);
+        ArrayList<ModiModule> moduleList = multiModuleMap.get(module.type);
 
         if(Objects.requireNonNull(moduleList).isEmpty()) return;
 
         moduleList.remove(module);
+
+            if(module.typeCode == 0x4010) {
+                ArrayList<ModiModule> moduleListA = multiModuleMap.get("MotorA");
+                moduleListA.remove(module);
+            }
+
+            else if(module.typeCode == 0x4011) {
+                ArrayList<ModiModule> moduleListB = multiModuleMap.get("MotorB");
+                moduleListB.remove(module);
+            }
 
         jsonListForInterpreter.remove(module.getJsonData());
     }
@@ -138,7 +194,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
                 return;
             }
 
-            ModiLog.i("root module uuid chaged" + mRootmodule.toString() + "to " + uuid);
+            ModiLog.i("root module uuid chaged" + mRootmodule + "to " + uuid);
             resetAllModules();
         }
 
@@ -219,7 +275,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
         if (!mModuleMap.containsKey(moduleKey)) {
 
             for (int i = 0; i < moduleData.length; i++) {
-                Log.v("Greg", "ModiModuleManager -> updateModule -> moduleData : " + moduleData[i]);
+//                Log.v("Greg", "ModiModuleManager -> updateModule -> moduleData : " + moduleData[i]);
             }
 
             int uuid = ByteBuffer.wrap(Arrays.copyOfRange(moduleData, 0, 4)).order(java.nio.ByteOrder.LITTLE_ENDIAN).getInt();
@@ -239,6 +295,12 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
             ModiModule module = ModiModule.makeModule(typeCode, uuid, decimalVersionData, getSubVersion(binaryVersionData), state, time);
             mModuleMap.put(moduleKey, module);
             module.index = addMultiModule(module);
+
+            if(typeCode == 0x4010 || typeCode == 0x4011) {
+                module.motoridx = addMultiModuleForMotor(module);
+//                Log.v("Greg", "ModiModuleManager -> updateModule -> module : " + module.getString() + " module.motoridx :" + module.motoridx);
+            }
+
             jsonListForInterpreter.add(module.getJsonData());
 
             ModiLog.i(module.getString() + " Connected. os-version = " + decimalVersionData);
@@ -286,6 +348,10 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
             module.index = addMultiModule(module);
             jsonListForInterpreter.add(module.getJsonData());
 
+            if(module.typeCode == 0x4010 || module.typeCode == 0x4011) {
+                module.motoridx = addMultiModuleForMotor(module);
+            }
+
             if (mListener != null) {
                 mListener.onConnectModule(this, module);
             }
@@ -301,12 +367,16 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
             int state = moduleData[6];
             Timestamp time = new Timestamp(System.currentTimeMillis());
 
-            Log.v("Greg", "ModiModuleManager -> updateModuleState -> version : " + version);
+//            Log.v("Greg", "ModiModuleManager -> updateModuleState -> module.typeCode : " + typeCode);
 
             ModiModule module = ModiModule.makeModule(typeCode, uuid, version, version, state, time);
             mModuleMap.put(id, module);
             module.index = addMultiModule(module);
             jsonListForInterpreter.add(module.getJsonData());
+
+            if(module.typeCode == 0x4010 || module.typeCode == 0x4011) {
+                module.motoridx = addMultiModuleForMotor(module);
+            }
 
             ModiLog.i(module.getString() + " Connected. os-version-cached = " + version);
 
@@ -376,7 +446,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
 
         mModuleMap.clear();
 
-        for (Map.Entry<Integer, ArrayList<ModiModule>> entry : multiModuleMap.entrySet()) {
+        for (Map.Entry<String, ArrayList<ModiModule>> entry : multiModuleMap.entrySet()) {
             Objects.requireNonNull(multiModuleMap.get(entry.getKey())).clear();
         }
     }

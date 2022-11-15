@@ -3,6 +3,7 @@ package com.luxrobo.modisdk.core;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.luxrobo.modisdk.enums.ModiType;
 import com.luxrobo.modisdk.utils.TextUtilsKt;
 
 import org.json.JSONException;
@@ -12,29 +13,12 @@ import java.sql.Timestamp;
 
 public class ModiModule {
 
-    public static final String TYPE_NETWORK = "Network";
-    public static final String TYPE_ENVIRONMENT = "Environment";
-    public static final String TYPE_GYRO = "Gyro";
-    public static final String TYPE_MIC = "Mic";
-    public static final String TYPE_BUTTON = "Button";
-    public static final String TYPE_DIAL = "Dial";
-    public static final String TYPE_ULTRASONIC = "Ultrasonic";
-    public static final String TYPE_IR = "Ir";
-    public static final String TYPE_DISPLAY = "Display";
-    public static final String TYPE_MOTOR = "Motor";
-    public static final String TYPE_MOTOR_B = "MotorB";
-    public static final String TYPE_LED = "Led";
-    public static final String TYPE_SPEAKER = "Speaker";
-    public static final String TYPE_BATTERY = "Battery";
-    public static final String TYPE_JOYSTICK= "Joystick";
-    public static final String TYPE_TOF= "Tof";
-    public static final String TYPE_IMU= "IMU";
-
     public int subVersion;
     public int version;
     public int typeCode;
     public String type = "null";
     public int index = 0;
+    public int motoridx = 0;
     public int uuid;
     public int state;
     public Timestamp lastUpdate;
@@ -53,22 +37,22 @@ public class ModiModule {
 
     public static String typeCodeToString(int typeCode) {
         switch (typeCode) {
-            case 0x0000: return TYPE_NETWORK;
-            case 0x0010: return TYPE_BATTERY;
-            case 0x2000: return TYPE_ENVIRONMENT;
-            case 0x2010: return TYPE_IMU;
-            case 0x2020: return TYPE_MIC;
-            case 0x2030: return TYPE_BUTTON;
-            case 0x2040: return TYPE_DIAL;
-            case 0x2050: return TYPE_ULTRASONIC;
-            case 0x2060: return TYPE_IR;
-            case 0x2070: return TYPE_JOYSTICK;
-            case 0x2080: return TYPE_TOF;
-            case 0x4000: return TYPE_DISPLAY;
-            case 0x4010: return TYPE_MOTOR;
-            case 0x4011: return TYPE_MOTOR_B;
-            case 0x4020: return TYPE_LED;
-            case 0x4030: return TYPE_SPEAKER;
+            case 0x0000: return ModiType.TYPE_NETWORK.getType();
+            case 0x0010: return ModiType.TYPE_BATTERY.getType();
+            case 0x2000: return ModiType.TYPE_ENVIRONMENT.getType();
+            case 0x2010: return ModiType.TYPE_IMU.getType();
+            case 0x2020: return ModiType.TYPE_MIC.getType();
+            case 0x2030: return ModiType.TYPE_BUTTON.getType();
+            case 0x2040: return ModiType.TYPE_DIAL.getType();
+            case 0x2050: return ModiType.TYPE_ULTRASONIC.getType();
+            case 0x2060: return ModiType.TYPE_IR.getType();
+            case 0x2070: return ModiType.TYPE_JOYSTICK.getType();
+            case 0x2080: return ModiType.TYPE_TOF.getType();
+            case 0x4000: return ModiType.TYPE_DISPLAY.getType();
+            case 0x4010: return ModiType.TYPE_MOTOR.getType();
+            case 0x4011: return ModiType.TYPE_MOTOR_B.getType();
+            case 0x4020: return ModiType.TYPE_LED.getType();
+            case 0x4030: return ModiType.TYPE_SPEAKER.getType();
 
             default:
                 break;
@@ -92,18 +76,12 @@ public class ModiModule {
     }
 
     public String getString() {
-
         String name = type.toLowerCase()+index;
 
-        if(typeCode == 0x4011) {
-            name = TYPE_MOTOR_B.toLowerCase()+index;
-            return String.format("this.%s = %s(0x%04X%08X);\n", name, TYPE_MOTOR, typeCode, uuid);
-        }
-
         return String.format("this.%s = %s(0x%04X%08X);\n", name, type, typeCode, uuid);
-//        return String.format("%s (%04X%8X)", type, typeCode, uuid);
-    }
 
+    }
+    
     public String getJsonData() {
 
         String haxUUID = String.format("0x%04X%08X", typeCode, uuid);

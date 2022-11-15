@@ -80,8 +80,7 @@ class ScanActivity : BaseActivity() {
 
         binding.btnUpload.setOnClickListener {
 
-
-            val byteArray = byteArrayOf(0,1,15,1,1,1,34,0,12,1,28,0,10,1,11,0,2,109,121,102,97,97,48,102,54,56,56,10,0,10,1,5,0,1,0,0,0,0,10,0,12,0,1,0,2,1,-31,0,51,1,-37,0,55,1,29,0,10,1,5,0,1,0,0,-128,63,10,0,11,1,1,0,25,11,0,10,1,5,0,1,0,0,0,0,10,0,55,0,56,1,-78,0,50,1,94,0,0,55,1,33,0,20,1,9,0,-120,-109,44,96,48,32,2,0,0,20,0,11,1,1,0,24,11,0,10,1,5,0,1,0,0,-56,66,10,0,55,0,56,1,48,0,21,1,42,0,-101,-26,39,20,32,64,16,0,3,10,1,5,0,1,0,0,-56,66,10,0,10,1,5,0,1,0,0,0,0,10,0,10,1,5,0,1,0,0,0,0,10,0,21,0,56,0,50,0,50,1,55,0,2,56,1,48,0,21,1,42,0,-101,-26,39,20,32,64,16,0,3,10,1,5,0,1,0,0,0,0,10,0,10,1,5,0,1,0,0,0,0,10,0,10,1,5,0,1,0,0,0,0,10,0,21,0,56,0,50,0,30,1,11,0,10,1,5,0,1,0,0,64,64,10,0,30,0,56,0,51,0,2,0,0,0)
+            val byteArray = byteArrayOf(0,1,16,1,1,1,34,0,12,1,28,0,10,1,11,0,2,109,121,102,97,97,48,102,54,56,56,10,0,10,1,5,0,1,0,0,0,0,10,0,12,0,1,0,2,1,30,0,30,1,11,0,10,1,5,0,1,0,0,6,68,10,0,30,0,51,1,35,0,55,1,29,0,10,1,5,0,1,0,0,80,63,10,0,11,1,1,0,25,11,0,10,1,5,0,1,0,0,0,0,10,0,55,0,56,1,94,0,21,1,20,0,43,75,44,96,16,64,17,0,1,10,1,5,0,1,0,0,32,65,10,0,21,0,21,1,20,0,64,90,44,96,17,64,17,0,1,10,1,5,0,1,0,0,32,65,10,0,21,0,30,1,35,0,14,1,29,0,10,1,5,0,1,0,0,64,64,10,0,11,1,1,0,13,11,0,10,1,5,0,1,0,0,122,68,10,0,14,0,30,0,21,1,20,0,43,75,44,96,16,64,17,0,1,10,1,5,0,1,0,0,0,0,10,0,21,0,21,1,20,0,64,90,44,96,17,64,17,0,1,10,1,5,0,1,0,0,0,0,10,0,21,0,30,1,11,0,10,1,5,0,1,0,0,64,64,10,0,30,0,56,0,51,0,2,0,0,0)
 
             val modiStream = ModiStream.makeStream(
                 mModiManager.getConnectedModiUuid() and 0xFFF,
@@ -110,7 +109,7 @@ class ScanActivity : BaseActivity() {
 
                 Log.d(
                     "Steave",
-                    "connectionTest onConnectModule moduleTyle : ${module?.type} , moduleVersion : ${module?.subVersion} , index : ${module?.index} , index+1 : $index , uuid : ${
+                    "connectionTest onConnectModule moduleTyle : ${module?.type} , moduleVersion : ${module?.subVersion} , index : ${module?.index} , motorIdx : ${module?.motoridx} , uuid : ${
                         String.format(
                             "0x%04X%08X",
                             module?.typeCode,
@@ -124,7 +123,7 @@ class ScanActivity : BaseActivity() {
             override fun onExpiredModule(manager: ModiModuleManager?, module: ModiModule?) {
                 Log.d(
                     "Steave",
-                    "connectionTest onExpiredModule moduleTyle : ${module?.type} , moduleVersion : ${module?.subVersion} , index : ${module?.index} , uuid : ${
+                    "connectionTest onExpiredModule moduleTyle : ${module?.type} , moduleVersion : ${module?.subVersion} , index : ${module?.index} , motorIdx : ${module?.motoridx} uuid : ${
                         String.format(
                             "0x%04X%08X",
                             module?.typeCode,

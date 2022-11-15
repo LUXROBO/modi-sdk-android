@@ -8,6 +8,7 @@ import com.luxrobo.modisdk.callback.ModiCodeUpdaterCallback;
 import com.luxrobo.modisdk.client.ModiFrameObserver;
 import com.luxrobo.modisdk.enums.CodeUpdateError;
 import com.luxrobo.modisdk.enums.ModiKind;
+import com.luxrobo.modisdk.enums.ModiType;
 import com.luxrobo.modisdk.utils.ModiLog;
 
 import java.nio.ByteBuffer;
@@ -272,7 +273,7 @@ public class ModiCodeUpdater implements ModiFrameObserver {
 
             for (ModiModule module : modules) {
                 // ignore network modules
-                if (module.type.equals(ModiModule.TYPE_NETWORK)) {
+                if (module.type.equals(ModiType.TYPE_NETWORK.getType())) {
                     progressNotifierAddCount(MODULE_PROGRESS_COUNT_UNIT);
                     continue;
                 }

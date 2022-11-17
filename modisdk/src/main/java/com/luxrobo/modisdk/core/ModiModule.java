@@ -92,6 +92,7 @@ public class ModiModule {
             result.put("index", String.valueOf(index));
             result.put("module", type.toLowerCase());
             result.put("uuid", haxUUID);
+            result.put("motoridx", motoridx);
         } catch (JSONException e) {
 
         }

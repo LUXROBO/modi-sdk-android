@@ -2,6 +2,7 @@ package com.luxrobo.modisdk.core;
 
 import android.util.Log;
 
+import com.luxrobo.modisdk.data.ModiVersion;
 import com.luxrobo.modisdk.enums.ModiType;
 import com.luxrobo.modisdk.utils.ModiStringUtil;
 import com.luxrobo.modisdk.utils.TextUtilsKt;
@@ -13,8 +14,7 @@ import java.sql.Timestamp;
 
 public class ModiModule {
 
-    public int appVersion;
-    public int osVersion;
+    public ModiVersion version;
     public int typeCode;
     public String type = "null";
     public int index = 0;
@@ -23,13 +23,17 @@ public class ModiModule {
     public int state;
     public Timestamp lastUpdate;
 
-    public static ModiModule makeModule(int type, int uuid, int version, int appVersion, int state, Timestamp time) {
+    public static ModiModule makeModule(int type, int uuid, int osVersion, int appVersion, int state, Timestamp time) {
         ModiModule module = new ModiModule();
+        ModiVersion version = new ModiVersion();
+
+        version.setOSVersion(osVersion);
+        version.setAppVersion(appVersion);
+
         module.typeCode = type;
         module.type = ModiModule.typeCodeToString(type);
         module.uuid = uuid;
-        module.appVersion = appVersion;
-        module.osVersion = version;
+        module.version = version;
         module.state = state;
         module.lastUpdate = time;
         return module;
@@ -65,16 +69,15 @@ public class ModiModule {
         module.uuid = uuid;
         module.type = type;
         module.typeCode = typeCode;
-        module.osVersion = osVersion;
-        module.appVersion = appVersion;
+        module.version = version;
         module.state = state;
         module.lastUpdate = lastUpdate;
         return module;
     }
 
-    public String getAppVersion() {
+    public String getAppVersionToString() {
 
-        String binaryVersionDataApp = Integer.toString(appVersion, 2);
+        String binaryVersionDataApp = Integer.toString(version.getAppVersion(), 2);
         int version = ModiStringUtil.getVersionFromBinary(binaryVersionDataApp);
         StringBuilder versionStr = new StringBuilder(String.valueOf(version));
 
@@ -85,12 +88,12 @@ public class ModiModule {
             }
         }
 
-        Log.v("Greg","ModiModule getAppVersion : "+ versionStr + " appVersion " + appVersion);
+        Log.v("Greg","ModiModule getAppVersion : "+ versionStr + " appVersion " + this.version.getAppVersion());
 
         return TextUtilsKt.addSeparator(versionStr.toString());
     }
-    public String getOSVersion() {
-        String binaryVersionDataOS= Integer.toString(osVersion, 2);
+    public String getOSVersionToString() {
+        String binaryVersionDataOS= Integer.toString(version.getOSVersion(), 2);
         int version = ModiStringUtil.getVersionFromBinary(binaryVersionDataOS);
         StringBuilder versionStr = new StringBuilder(String.valueOf(version));
 
@@ -100,7 +103,7 @@ public class ModiModule {
                 versionStr.append("0");
             }
         }
-        Log.v("Greg","ModiModule getOSVersion : "+version + " getOSVersion " + osVersion);
+        Log.v("Greg","ModiModule getOSVersion : "+version + " getOSVersion " + this.version.getOSVersion());
 
         return TextUtilsKt.addSeparator(versionStr.toString());
     }
@@ -108,6 +111,10 @@ public class ModiModule {
     public String getString() {
         String name = type.toLowerCase()+index;
         return String.format("this.%s = %s(0x%04X%08X);\n", name, type, typeCode, uuid);
+    }
+
+    public int getUUID() {
+        return uuid;
     }
     
     public String getJsonData() {
@@ -120,8 +127,8 @@ public class ModiModule {
             result.put("index", String.valueOf(index));
             result.put("type", type.toLowerCase());
             result.put("uuid", haxUUID);
-            result.put("osVersion", getOSVersion());
-            result.put("appVersion", getAppVersion());
+            result.put("osVersion", getOSVersionToString());
+            result.put("appVersion", getAppVersionToString());
             result.put("motoridx", motoridx);
         } catch (JSONException e) {
 

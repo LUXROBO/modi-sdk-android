@@ -5,6 +5,7 @@ import android.os.Looper;
 import android.util.Log;
 
 import com.luxrobo.modisdk.client.ModiFrameObserver;
+import com.luxrobo.modisdk.data.ModiVersion;
 import com.luxrobo.modisdk.enums.ModiType;
 import com.luxrobo.modisdk.listener.ModiModuleManagerListener;
 import com.luxrobo.modisdk.utils.ModiLog;
@@ -233,18 +234,34 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
         if (mModuleMap.containsKey(key)) {
             ModiModule m = mModuleMap.get(key);
 
-            ModiLog.d(m.toString() + "version : " + m.appVersion);
+            ModiLog.d(m.toString() + "version : " + m.version.getAppVersion());
 
-            return m.appVersion;
+            return m.version.getAppVersion();
         } else if (mDisabledModuleMap.containsKey(key)) {
             ModiModule m = mDisabledModuleMap.get(key);
 
-            ModiLog.d(m.toString() + "last version : " + m.appVersion);
-            return m.appVersion;
+            ModiLog.d(m.toString() + "last version : " + m.version.getAppVersion());
+            return m.version.getAppVersion();
         }
 
         ModiLog.d(uuid + " can't find version");
         return 16690;
+    }
+
+    public void setModuleVersion(int uuid, ModiVersion version) {
+
+        int key = uuid & 0xFFF;
+
+        if(mModuleMap.containsKey(key)) {
+            ModiModule m = mModuleMap.get(key);
+
+            m.version = version;
+
+        } else if (mDisabledModuleMap.containsKey(key)) {
+            ModiModule m = mModuleMap.get(key);
+
+            m.version = version;
+        }
     }
 
     @Override

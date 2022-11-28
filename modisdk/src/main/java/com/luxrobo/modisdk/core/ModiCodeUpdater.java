@@ -292,10 +292,14 @@ public class ModiCodeUpdater implements ModiFrameObserver {
                 }
 
                 for (int retry = 0; retry < RetryMaxCount; retry++) {
+
                     try {
+
                         setPlugAndPlayModule(module, pnpFlag, userFlag);
                         break;
+
                     } catch (Exception e) {
+
                         if (retry == RetryMaxCount - 1) {
                             throw e;
                         }
@@ -513,7 +517,6 @@ public class ModiCodeUpdater implements ModiFrameObserver {
         return buffer;
     }
 
-
     private void setPlugAndPlayModule(ModiModule module, boolean pnpEnable, boolean userEnable) throws Exception {
         ModiFrame res;
         final int targetModuleKey = module.uuid & 0xFFF;
@@ -534,7 +537,7 @@ public class ModiCodeUpdater implements ModiFrameObserver {
                 break;
             case MODI_PLUS:
 
-                if (module.type.equals("Network") || module.type.equals("Display") || module.type.equals("Environment") || module.type.equals("Speaker")) {
+                if (module.type.equals(ModiType.TYPE_NETWORK.getType()) || module.type.equals(ModiType.TYPE_DISPLAY.getType()) || module.type.equals(ModiType.TYPE_ENVIRONMENT.getType()) || module.type.equals(ModiType.TYPE_SPEAKER.getType())) {
                     address = 0x0801F800;
                     moduleCase = 0;
                 }
@@ -558,35 +561,32 @@ public class ModiCodeUpdater implements ModiFrameObserver {
         pnpData[3] = (byte) 0x00;
 
         ByteBuffer id_buffer = ByteBuffer.allocate(4);
-        ByteBuffer version_buffer = ByteBuffer.allocate(4);
+        ByteBuffer osVersion_buffer = ByteBuffer.allocate(4);
+        ByteBuffer appVersion_buffer = ByteBuffer.allocate(4);
 
         id_buffer.order(ByteOrder.LITTLE_ENDIAN).putInt(module.uuid & 0xFFF);
-        version_buffer.order(ByteOrder.LITTLE_ENDIAN).putInt(module.version);
+        osVersion_buffer.order(ByteOrder.LITTLE_ENDIAN).putInt(module.osVersion);
+        appVersion_buffer.order(ByteOrder.LITTLE_ENDIAN).putInt(module.appVersion);
 
         pnpData[4] = id_buffer.get(0);
         pnpData[5] = id_buffer.get(1);
-        pnpData[6] = version_buffer.get(0);
-        pnpData[7] = version_buffer.get(1);
+        pnpData[6] = osVersion_buffer.get(0);
+        pnpData[7] = osVersion_buffer.get(1);
 
         byte[] bootingAddress = new byte[8];
 
         bootingAddress[0] = (byte) 0x00;
         bootingAddress[1] = (byte) 0x00;
-        bootingAddress[2] = (byte) 0x00;
-        bootingAddress[3] = (byte) 0x00;
-
+        bootingAddress[2] = appVersion_buffer.get(0);
+        bootingAddress[3] = appVersion_buffer.get(1);
         bootingAddress[4] = (byte) 0x00;
         bootingAddress[6] = (byte) 0x00;
         bootingAddress[7] = (byte) 0x08;
 
         if(moduleCase == 0) {
-
             bootingAddress[5] = (byte) 0x90;
-
         } else {
-
             bootingAddress[5] = (byte) 0x50;
-
         }
 
         send(ModiProtocol.firmwareData(targetModuleKey, 0, pnpData));
@@ -600,6 +600,8 @@ public class ModiCodeUpdater implements ModiFrameObserver {
         for (byte datum : reverseData) {
             revlog.append(Integer.toHexString((int) datum & 0xFF)).append(", ");
         }
+
+        ModiLog.i(module.type + " osVersion " + module.osVersion +  " appVersion " + module.appVersion + " reverseData1 " + revlog + " crcValue1 : " + crcValue1);
 
         mRecvQueue.clear();
 
@@ -623,7 +625,7 @@ public class ModiCodeUpdater implements ModiFrameObserver {
                 }
 
                 long crcValue2 = calculateCrc32(reverseData,crcValue1);
-
+                ModiLog.i(module.type + " reverseData2 " + revlog + " crcValue2 : " + crcValue2);
                 mRecvQueue.clear();
                 send(ModiProtocol.firmwareCommand(targetModuleKey, ModiProtocol.FLASH_CMD.CHECK_CRC, address, (int)crcValue2));
         }

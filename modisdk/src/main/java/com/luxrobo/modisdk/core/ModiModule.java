@@ -2,8 +2,8 @@ package com.luxrobo.modisdk.core;
 
 import android.util.Log;
 
-import com.google.gson.Gson;
 import com.luxrobo.modisdk.enums.ModiType;
+import com.luxrobo.modisdk.utils.ModiStringUtil;
 import com.luxrobo.modisdk.utils.TextUtilsKt;
 
 import org.json.JSONException;
@@ -13,8 +13,8 @@ import java.sql.Timestamp;
 
 public class ModiModule {
 
-    public int subVersion;
-    public int version;
+    public int appVersion;
+    public int osVersion;
     public int typeCode;
     public String type = "null";
     public int index = 0;
@@ -23,13 +23,13 @@ public class ModiModule {
     public int state;
     public Timestamp lastUpdate;
 
-    public static ModiModule makeModule(int type, int uuid, int version, int subVersion, int state, Timestamp time) {
+    public static ModiModule makeModule(int type, int uuid, int version, int appVersion, int state, Timestamp time) {
         ModiModule module = new ModiModule();
         module.typeCode = type;
         module.type = ModiModule.typeCodeToString(type);
         module.uuid = uuid;
-        module.subVersion = subVersion;
-        module.version = version;
+        module.appVersion = appVersion;
+        module.osVersion = version;
         module.state = state;
         module.lastUpdate = time;
         return module;
@@ -65,21 +65,49 @@ public class ModiModule {
         module.uuid = uuid;
         module.type = type;
         module.typeCode = typeCode;
-        module.subVersion = subVersion;
+        module.osVersion = osVersion;
+        module.appVersion = appVersion;
         module.state = state;
         module.lastUpdate = lastUpdate;
         return module;
     }
 
-    public String getSubVersion() {
-        return TextUtilsKt.addSeparator(String.valueOf(subVersion));
+    public String getAppVersion() {
+
+        String binaryVersionDataApp = Integer.toString(appVersion, 2);
+        int version = ModiStringUtil.getVersionFromBinary(binaryVersionDataApp);
+        StringBuilder versionStr = new StringBuilder(String.valueOf(version));
+
+        if(versionStr.length() < 3) {
+
+            while (versionStr.length() < 3) {
+                versionStr.append("0");
+            }
+        }
+
+        Log.v("Greg","ModiModule getAppVersion : "+ versionStr + " appVersion " + appVersion);
+
+        return TextUtilsKt.addSeparator(versionStr.toString());
+    }
+    public String getOSVersion() {
+        String binaryVersionDataOS= Integer.toString(osVersion, 2);
+        int version = ModiStringUtil.getVersionFromBinary(binaryVersionDataOS);
+        StringBuilder versionStr = new StringBuilder(String.valueOf(version));
+
+        if(versionStr.length() < 3) {
+
+            while (versionStr.length() < 3) {
+                versionStr.append("0");
+            }
+        }
+        Log.v("Greg","ModiModule getOSVersion : "+version + " getOSVersion " + osVersion);
+
+        return TextUtilsKt.addSeparator(versionStr.toString());
     }
 
     public String getString() {
         String name = type.toLowerCase()+index;
-
         return String.format("this.%s = %s(0x%04X%08X);\n", name, type, typeCode, uuid);
-
     }
     
     public String getJsonData() {
@@ -92,6 +120,8 @@ public class ModiModule {
             result.put("index", String.valueOf(index));
             result.put("type", type.toLowerCase());
             result.put("uuid", haxUUID);
+            result.put("osVersion", getOSVersion());
+            result.put("appVersion", getAppVersion());
             result.put("motoridx", motoridx);
         } catch (JSONException e) {
 

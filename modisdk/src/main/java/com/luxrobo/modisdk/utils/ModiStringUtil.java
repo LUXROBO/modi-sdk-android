@@ -16,7 +16,9 @@ import java.util.HashMap;
 
 
 public class ModiStringUtil {
-    
+
+
+
     /**
      * 빈 문자열 체크
      * 
@@ -427,5 +429,31 @@ public class ModiStringUtil {
     public static String convertByteToHexString(byte[] data) throws Exception {
 
         return convertByteToHexString(data, "");
+    }
+
+    public static int getVersionFromBinary(String data) {
+        return convertBinaryToDecimal(getBinaryOfVersion(data));
+    }
+
+    private static StringBuffer getBinaryOfVersion(String binaryString) {
+        StringBuffer stringBuffer = new StringBuffer(16);
+
+        for (int i = 0; i < 16 - binaryString.length(); i++) {
+            stringBuffer.append("0");
+        }
+
+        for (int i = 0; i < binaryString.length(); i++) {
+            stringBuffer.append(binaryString.charAt(i));
+        }
+
+        return stringBuffer;
+    }
+
+    public static int convertBinaryToDecimal(StringBuffer frameOfSubVersion) {
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append(Integer.parseInt(frameOfSubVersion.toString().substring(0, 3), 2));
+        stringBuffer.append(Integer.parseInt(frameOfSubVersion.toString().substring(3, 8), 2));
+        stringBuffer.append(Integer.parseInt(frameOfSubVersion.toString().substring(8, 16), 2));
+        return Integer.parseInt(stringBuffer.toString());
     }
 }

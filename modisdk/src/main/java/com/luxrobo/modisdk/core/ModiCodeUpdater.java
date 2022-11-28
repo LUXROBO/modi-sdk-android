@@ -6,6 +6,7 @@ import com.crccalc.Crc32;
 import com.crccalc.CrcCalculator;
 import com.luxrobo.modisdk.callback.ModiCodeUpdaterCallback;
 import com.luxrobo.modisdk.client.ModiFrameObserver;
+import com.luxrobo.modisdk.data.ModiVersion;
 import com.luxrobo.modisdk.enums.CodeUpdateError;
 import com.luxrobo.modisdk.enums.ModiKind;
 import com.luxrobo.modisdk.enums.ModiType;
@@ -147,7 +148,7 @@ public class ModiCodeUpdater implements ModiFrameObserver {
 
     public void startUpdate_plus(@NonNull ModiStream stream, @NonNull ModiCodeUpdaterCallback callback) {
 
-        if (mRunningFlag == true) {
+        if (mRunningFlag) {
             callback.onUpdateFailed(CodeUpdateError.CODE_NOW_UPDATING, "Code Update Task is running");
             return;
         }
@@ -166,7 +167,7 @@ public class ModiCodeUpdater implements ModiFrameObserver {
 
     public void startReset(@NonNull ModiCodeUpdaterCallback callback) {
 
-        if (mRunningFlag == true) {
+        if (mRunningFlag) {
             callback.onUpdateFailed(CodeUpdateError.CODE_NOW_UPDATING, "Code Update Task is running");
             return;
         }
@@ -188,7 +189,7 @@ public class ModiCodeUpdater implements ModiFrameObserver {
 
     public void startReset_plus(@NonNull ModiCodeUpdaterCallback callback) {
 
-        if (mRunningFlag == true) {
+        if (mRunningFlag) {
             callback.onUpdateFailed(CodeUpdateError.CODE_NOW_UPDATING, "Code Update Task is running");
             return;
         }
@@ -565,8 +566,8 @@ public class ModiCodeUpdater implements ModiFrameObserver {
         ByteBuffer appVersion_buffer = ByteBuffer.allocate(4);
 
         id_buffer.order(ByteOrder.LITTLE_ENDIAN).putInt(module.uuid & 0xFFF);
-        osVersion_buffer.order(ByteOrder.LITTLE_ENDIAN).putInt(module.osVersion);
-        appVersion_buffer.order(ByteOrder.LITTLE_ENDIAN).putInt(module.appVersion);
+        osVersion_buffer.order(ByteOrder.LITTLE_ENDIAN).putInt(module.version.getOSVersion());
+        appVersion_buffer.order(ByteOrder.LITTLE_ENDIAN).putInt(module.version.getAppVersion());
 
         pnpData[4] = id_buffer.get(0);
         pnpData[5] = id_buffer.get(1);
@@ -574,11 +575,11 @@ public class ModiCodeUpdater implements ModiFrameObserver {
         pnpData[7] = osVersion_buffer.get(1);
 
         byte[] bootingAddress = new byte[8];
+        bootingAddress[0] = appVersion_buffer.get(0);
+        bootingAddress[1] = appVersion_buffer.get(1);
+        bootingAddress[2] = (byte) 0x00;
+        bootingAddress[3] = (byte) 0x00;
 
-        bootingAddress[0] = (byte) 0x00;
-        bootingAddress[1] = (byte) 0x00;
-        bootingAddress[2] = appVersion_buffer.get(0);
-        bootingAddress[3] = appVersion_buffer.get(1);
         bootingAddress[4] = (byte) 0x00;
         bootingAddress[6] = (byte) 0x00;
         bootingAddress[7] = (byte) 0x08;
@@ -588,7 +589,7 @@ public class ModiCodeUpdater implements ModiFrameObserver {
         } else {
             bootingAddress[5] = (byte) 0x50;
         }
-
+        ModiLog.i(module.getJsonData() + "check version");
         send(ModiProtocol.firmwareData(targetModuleKey, 0, pnpData));
 
         byte[] reverseData = reverseBlock(pnpData);
@@ -600,8 +601,6 @@ public class ModiCodeUpdater implements ModiFrameObserver {
         for (byte datum : reverseData) {
             revlog.append(Integer.toHexString((int) datum & 0xFF)).append(", ");
         }
-
-        ModiLog.i(module.type + " osVersion " + module.osVersion +  " appVersion " + module.appVersion + " reverseData1 " + revlog + " crcValue1 : " + crcValue1);
 
         mRecvQueue.clear();
 

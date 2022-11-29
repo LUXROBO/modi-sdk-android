@@ -255,13 +255,21 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
         if(mModuleMap.containsKey(key)) {
             ModiModule m = mModuleMap.get(key);
 
+            jsonListForInterpreter.remove(m.getJsonData());
+
             m.version = version;
+            jsonListForInterpreter.add(m.getJsonData());
 
         } else if (mDisabledModuleMap.containsKey(key)) {
             ModiModule m = mModuleMap.get(key);
 
+            jsonListForInterpreter.remove(m.getJsonData());
+
             m.version = version;
+            jsonListForInterpreter.add(m.getJsonData());
         }
+
+
     }
 
     @Override

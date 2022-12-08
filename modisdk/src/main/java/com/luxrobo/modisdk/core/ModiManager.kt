@@ -202,10 +202,7 @@ class ModiManager : ModiFrameNotifier() {
 
 //                        mModiClient!!.onReceivedData(stringBuilder.toString())
                     mModiClient!!.onReceivedData(it)
-
                     notifyModiFrame(ModiFrame(it))
-
-
                 }
             },
                  {
@@ -233,6 +230,9 @@ class ModiManager : ModiFrameNotifier() {
                     ModiLog.d(msg)
 
                     modiId = it
+
+                    mModuleManager.setRootModule(getConnectedModiUuid())
+                    sendData(ModiProtocol.getVersion(getConnectedModiUuid() and 0xFFF))
                 },
                 {
                     ModiLog.e("readCharacteristic $it")
@@ -252,18 +252,6 @@ class ModiManager : ModiFrameNotifier() {
                 }
             }
         }
-
-        Handler().postDelayed(
-            {
-
-                mModuleManager.setRootModule(getConnectedModiUuid())
-                sendData(ModiProtocol.getVersion(getConnectedModiUuid() and 0xFFF))
-
-            }
-            ,1000
-        )
-
-
     }
 
     fun connect(macAddress : String) {

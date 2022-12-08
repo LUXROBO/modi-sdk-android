@@ -259,22 +259,13 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
 
             m.version = version;
             jsonListForInterpreter.add(m.getJsonData());
-
-        } else if (mDisabledModuleMap.containsKey(key)) {
-            ModiModule m = mModuleMap.get(key);
-
-            jsonListForInterpreter.remove(m.getJsonData());
-
-            m.version = version;
-            jsonListForInterpreter.add(m.getJsonData());
         }
-
-
     }
 
     @Override
     public void onModiFrame(ModiFrame frame) {
         int cmd = frame.cmd();
+
         switch (cmd) {
             case 0x07:
             case 0x00: {
@@ -282,10 +273,16 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
                 break;
             }
             case 0x05: {
+                if(frame.len() < 10) {
+                    return;
+                }
                 updateModule(frame.sid(), frame.data());
                 break;
             }
             case 0x0A: {
+                if(frame.len() < 10) {
+                    return;
+                }
                 updateModuleState(frame.sid(), frame.data());
                 break;
             }

@@ -7,10 +7,12 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.gun0912.tedpermission.TedPermissionResult
 import com.luxrobo.modisdk.utils.ModiLog
 import com.luxrobo.sample.modidemo.databinding.ActivityMainBinding
 import com.luxrobo.sample.modidemo.sample_modi_demo.example_scanning.ScanActivity
@@ -41,6 +43,7 @@ class MainActivity : BaseActivity() {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     private fun permissionCheck() {
 
         ModiLog.d("kstlove permissionCheck()")
@@ -59,6 +62,24 @@ class MainActivity : BaseActivity() {
 
             if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
                 permissionList.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+            }
+
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN)
+
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionList.add(Manifest.permission.BLUETOOTH_SCAN)
+            }
+
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionList.add(Manifest.permission.BLUETOOTH_CONNECT)
+            }
+
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionList.add(Manifest.permission.BLUETOOTH_CONNECT)
             }
 
             if (permissionList.isNotEmpty()) {

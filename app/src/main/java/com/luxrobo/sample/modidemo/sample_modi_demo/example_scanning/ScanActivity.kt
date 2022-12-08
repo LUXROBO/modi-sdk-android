@@ -124,6 +124,10 @@ class ScanActivity : BaseActivity() {
             mPlayManager.modiPlusEvent(0,3,PlayCommand.BUTTON_CLICK, PlayCommandData.PRESSED.value)
         }
 
+        binding.btnDisconnect.setOnClickListener {
+            mModiManager.disconnect()
+        }
+
         mModeModuleManager.setListener(object : ModiModuleManagerListener {
 
             override fun onConnectModule(manager: ModiModuleManager?, module: ModiModule?) {
@@ -188,6 +192,7 @@ class ScanActivity : BaseActivity() {
 
             override fun onDiscoveredService() {
                 ModiLog.e("onDiscoveredService")
+                mModeModuleManager.discoverModules()
             }
 
             override fun onDiscoverServiceFailure() {

@@ -198,7 +198,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
         }
 
         ModiModule rootModule = ModiModule.makeModule(0x0000, uuid, 0, 0, 0, new Timestamp(System.currentTimeMillis()));
-        ModiLog.i("set Root Module " + rootModule.toString());
+        ModiLog.i("set Root Module " + rootModule);
 
         mRootmodule = rootModule;
 

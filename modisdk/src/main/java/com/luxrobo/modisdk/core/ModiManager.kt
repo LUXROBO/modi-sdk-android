@@ -231,7 +231,7 @@ class ModiManager : ModiFrameNotifier() {
 
                     modiId = it
 
-                    mModuleManager.setRootModule(getConnectedModiUuid())
+//                    mModuleManager.setRootModule(getConnectedModiUuid())
                     sendData(ModiProtocol.getVersion(getConnectedModiUuid() and 0xFFF))
                 },
                 {

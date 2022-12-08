@@ -208,11 +208,9 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
     }
 
     public void resetAllModules() {
-        if (mRootmodule != null) {
-            ModiLog.i("expire root module : " + mRootmodule.toString());
-            expireAllModules();
-            mRootmodule = null;
-        }
+
+        ModiLog.i("resetAllModules : " + mModuleMap.size());
+        expireAllModules();
     }
 
     public ModiModule getModule(int uuid) {
@@ -265,7 +263,6 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
     @Override
     public void onModiFrame(ModiFrame frame) {
         int cmd = frame.cmd();
-
         switch (cmd) {
             case 0x07:
             case 0x00: {
@@ -274,6 +271,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
             }
             case 0x05: {
                 if(frame.len() < 10) {
+                    ModiLog.d(" 0x05 frame.len() < 10)");
                     return;
                 }
                 updateModule(frame.sid(), frame.data());
@@ -281,6 +279,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
             }
             case 0x0A: {
                 if(frame.len() < 10) {
+                    ModiLog.d(" 0x0A frame.len() < 10)");
                     return;
                 }
                 updateModuleState(frame.sid(), frame.data());
@@ -292,6 +291,9 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
     }
 
     private void updateModule(int moduleKey, byte[] moduleData) {
+
+        ModiLog.d(" updateModule " + mModuleMap.size());
+
         if (!mModuleMap.containsKey(moduleKey)) {
 
             int uuid = ByteBuffer.wrap(Arrays.copyOfRange(moduleData, 0, 4)).order(java.nio.ByteOrder.LITTLE_ENDIAN).getInt();
@@ -302,8 +304,8 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
             int state = getModuleState(moduleKey);
             Timestamp time = new Timestamp(System.currentTimeMillis());
 
-//            ModiLog.i(" Connected. os-version binaryVersionDataOS = " + binaryVersionDataOS);
-//            ModiLog.i(" Connected. os-version binaryVersionDataApp = " + binaryVersionDataApp);
+            ModiLog.i(" Connected. os-version binaryVersionDataOS = " + moduleOSVersion);
+            ModiLog.i(" Connected. os-version binaryVersionDataApp = " + moduleAppVersion);
 
             ModiModule module = ModiModule.makeModule(typeCode, uuid, moduleOSVersion, moduleAppVersion, state, time);
             mModuleMap.put(moduleKey, module);

@@ -316,6 +316,11 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
 //                Log.v("Greg", "ModiModuleManager -> updateModule -> module : " + module.getString() + " module.motoridx :" + module.motoridx);
             }
 
+            else if (typeCode == 0x0000) {
+                mRootmodule = module;
+                mHandler.postDelayed(this, MODULE_CHECK_PERIOD);
+            }
+
             jsonListForInterpreter.add(module.getJsonData());
 
             removeDisableMapModule(moduleKey);
@@ -460,6 +465,8 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
     @Override
     public void run() {
 
+        ModiLog.d(" steave run : mRootmodule " + mRootmodule.getJsonData());
+
         if (mRootmodule != null) {
 
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
@@ -473,7 +480,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
 
                 ModiModule module = entry.getValue();
                 long duration = currentTime.getTime() - module.lastUpdate.getTime();
-
+                ModiLog.d(" steave run : " + module.getJsonData());
                 // MODULE_TIMEOUT_PERIOD 이상 응답이 없는 모듈 expire
                 if (duration > MODULE_TIMEOUT_PERIOD) {
                     ModiLog.i(module.getString() + " add expireList");

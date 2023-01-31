@@ -97,7 +97,6 @@ class ScanActivity : BaseActivity() {
         binding.btnInit.setOnClickListener {
 
 
-
             mModeModuleManager.modules.forEach {
 
                 val version = ModiVersion()
@@ -121,12 +120,16 @@ class ScanActivity : BaseActivity() {
 
         binding.btnSend.setOnClickListener {
 
-            mPlayManager.modiPlusEvent(0,3,PlayCommand.BUTTON_CLICK, PlayCommandData.PRESSED.value)
+//            mPlayManager.modiPlusEvent(0,3,PlayCommand.BUTTON_CLICK, PlayCommandData.PRESSED.value)
+            mModiManager.sendData(ModiProtocol.startMonitoring(0x03f, 2,0x37a))
         }
 
         binding.btnDisconnect.setOnClickListener {
-            mModiManager.disconnect()
+//            mModiManager.disconnect()
+
+            mModiManager.sendData(ModiProtocol.stopMonitoring(0x03f, 2,0x37a))
         }
+
 
         mModeModuleManager.setListener(object : ModiModuleManagerListener {
 

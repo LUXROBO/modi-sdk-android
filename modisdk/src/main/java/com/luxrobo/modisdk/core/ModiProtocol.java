@@ -238,4 +238,27 @@ public class ModiProtocol {
         return ModiFrame.makeFrame(0xA0, 25, moduleKey, data);
     }
 
+    public static byte[] startMonitoring(int moduleKey, int propertyNumber, int did) {
+
+        byte[] data = new byte[4];
+        data[0] = (byte) (propertyNumber & 0xFF);
+        data[1] = (byte) ((propertyNumber >> 8) & 0xFF);
+        data[2] = (byte) (100 & 0xFF);
+        data[3] = (byte) ((100 >> 8) & 0xFF);
+
+        return ModiFrame.makeFrame(0x03, moduleKey, did, data);
+    }
+
+    public static byte[] stopMonitoring(int moduleKey, int propertyNumber, int did) {
+
+        byte[] data = new byte[5];
+        data[0] = (byte) (propertyNumber & 0xFF);
+        data[1] = (byte) ((propertyNumber >> 8) & 0xFF);
+        data[2] = (byte) (100 & 0xFF);
+        data[3] = (byte) ((100 >> 8) & 0xFF);
+        data[4] = 0x01;
+
+        return ModiFrame.makeFrame(0x03, moduleKey, did, data);
+    }
+
 }

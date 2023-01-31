@@ -465,7 +465,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
     @Override
     public void run() {
 
-        ModiLog.d(" steave run : mRootmodule " + mRootmodule.getJsonData());
+//        ModiLog.d(" steave run : mRootmodule " + mRootmodule.getJsonData());
 
         if (mRootmodule != null) {
 
@@ -480,7 +480,7 @@ public class ModiModuleManager implements ModiFrameObserver, Runnable {
 
                 ModiModule module = entry.getValue();
                 long duration = currentTime.getTime() - module.lastUpdate.getTime();
-                ModiLog.d(" steave run : " + module.getJsonData());
+//                ModiLog.d(" steave run : " + module.getJsonData());
                 // MODULE_TIMEOUT_PERIOD 이상 응답이 없는 모듈 expire
                 if (duration > MODULE_TIMEOUT_PERIOD) {
                     ModiLog.i(module.getString() + " add expireList");

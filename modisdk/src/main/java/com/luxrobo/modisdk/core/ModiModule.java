@@ -66,6 +66,7 @@ public class ModiModule {
 
     public ModiModule clone() {
         ModiModule module = new ModiModule();
+        module.index = index;
         module.uuid = uuid;
         module.type = type;
         module.typeCode = typeCode;

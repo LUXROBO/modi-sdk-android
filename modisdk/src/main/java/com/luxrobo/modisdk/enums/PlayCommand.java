@@ -18,6 +18,7 @@ public enum PlayCommand {
     IMU_ROTATION(0x00),
 
     //MODI1
+    JOYSTICK_MODI_1(0x0003),
     DIAL_MODI_1(0x0004),
     LEFT_SLIDER_MODI_1(0x0005),
     RIGHT_SLIDER_MODI_1(0x0006),

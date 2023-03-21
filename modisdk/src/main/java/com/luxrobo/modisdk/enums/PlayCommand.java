@@ -18,6 +18,7 @@ public enum PlayCommand {
     IMU_ROTATION(0x00),
 
     //MODI1
+    BUTTON_PRESS_STATUS_MODI_1(0x0003),
     JOYSTICK_MODI_1(0x0003),
     DIAL_MODI_1(0x0004),
     LEFT_SLIDER_MODI_1(0x0005),
@@ -31,6 +32,6 @@ public enum PlayCommand {
 
     PlayCommand(int value) {
 
-        this.value = (value & 0xFF);
+        this.value = (value & 0xFFFF);
     }
 }

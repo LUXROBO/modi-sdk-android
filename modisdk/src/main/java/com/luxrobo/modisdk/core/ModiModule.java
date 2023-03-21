@@ -64,6 +64,26 @@ public class ModiModule {
         return "Unknown";
     }
 
+    public static String typeCodeToString_MODI_1(int typeCode) {
+        switch (typeCode) {
+            case 0x0000: return ModiType.TYPE_NETWORK.getType();
+            case 0x2000: return ModiType.TYPE_ENVIRONMENT.getType();
+            case 0x2010: return ModiType.TYPE_GYRO.getType();
+            case 0x2020: return ModiType.TYPE_MIC.getType();
+            case 0x2030: return ModiType.TYPE_BUTTON.getType();
+            case 0x2040: return ModiType.TYPE_DIAL.getType();
+            case 0x2050: return ModiType.TYPE_ULTRASONIC.getType();
+            case 0x2060: return ModiType.TYPE_IR.getType();
+            case 0x4000: return ModiType.TYPE_DISPLAY.getType();
+            case 0x4010: return ModiType.TYPE_MOTOR.getType();
+            case 0x4020: return ModiType.TYPE_LED.getType();
+            case 0x4030: return ModiType.TYPE_SPEAKER.getType();
+            default:
+                break;
+        }
+        return "Unknown";
+    }
+
     public ModiModule clone() {
         ModiModule module = new ModiModule();
         module.index = index;

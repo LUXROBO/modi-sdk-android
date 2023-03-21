@@ -16,6 +16,15 @@ public enum PlayCommand {
     IMU_ANGLE_YAW(0x04),
     IMU_DIRECTION(0x00),
     IMU_ROTATION(0x00),
+
+    //MODI1
+    DIAL_MODI_1(0x0004),
+    LEFT_SLIDER_MODI_1(0x0005),
+    RIGHT_SLIDER_MODI_1(0x0006),
+    TIMER_MODI_1(0x0007),
+    BUTTON_CLICK_MODI_1(0x0102),
+    BUTTON_DOUBLE_CLICK_MODI_1(0x0103),
+    TOGGLE(0x0104),
     ;
     public int value;
 

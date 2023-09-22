@@ -145,12 +145,13 @@ public class ModiModule {
         JSONObject result = new JSONObject();
 
         try {
-            result.put("index", String.valueOf(index));
-            result.put("type", type.toLowerCase());
-            result.put("uuid", haxUUID);
+            result.put("id", haxUUID);
+            result.put("name", type);
+            result.put("type", type);
+            result.put("fieldIndex", String.valueOf(index));
+            result.put("defineIndex", String.valueOf(motoridx));
             result.put("osVersion", getOSVersionToString());
             result.put("appVersion", getAppVersionToString());
-            result.put("motoridx", motoridx);
         } catch (JSONException e) {
 
         }

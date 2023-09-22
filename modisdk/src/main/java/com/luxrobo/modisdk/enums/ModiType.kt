@@ -2,21 +2,21 @@ package com.luxrobo.modisdk.enums
 
 enum class ModiType (val type: String) {
 
-    TYPE_NETWORK("Network"),
-    TYPE_ENVIRONMENT("Environment"),
-    TYPE_GYRO("Gyro"),
-    TYPE_MIC("Mic"),
-    TYPE_BUTTON("Button"),
-    TYPE_DIAL("Dial"),
-    TYPE_ULTRASONIC("Ultrasonic"),
-    TYPE_IR("Ir"),
-    TYPE_DISPLAY("Display"),
-    TYPE_MOTOR("MotorA"),
-    TYPE_MOTOR_B("MotorB"),
-    TYPE_LED("Led"),
-    TYPE_SPEAKER("Speaker"),
-    TYPE_BATTERY("Battery"),
-    TYPE_JOYSTICK("Joystick"),
-    TYPE_TOF("Tof"),
-    TYPE_IMU("IMU")
+    TYPE_NETWORK("network"),
+    TYPE_ENVIRONMENT("environment"),
+    TYPE_GYRO("gyro"),
+    TYPE_MIC("mic"),
+    TYPE_BUTTON("button"),
+    TYPE_DIAL("dial"),
+    TYPE_ULTRASONIC("ultrasonic"),
+    TYPE_IR("ir"),
+    TYPE_DISPLAY("display"),
+    TYPE_MOTOR("motorA"),
+    TYPE_MOTOR_B("motorB"),
+    TYPE_LED("led"),
+    TYPE_SPEAKER("speaker"),
+    TYPE_BATTERY("battery"),
+    TYPE_JOYSTICK("joystick"),
+    TYPE_TOF("tof"),
+    TYPE_IMU("imu")
 }
